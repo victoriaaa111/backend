@@ -28,7 +28,7 @@ export class AuthService {
     @InjectModel(ResetToken.name)
     private ResetTokenModel: Model<ResetToken>,
     private jwtService: JwtService,
-    private mailService:MailService,
+    private mailService: MailService,
   ) {}
 
   async signup(signupData: SignupDto) {
@@ -72,7 +72,7 @@ export class AuthService {
     };
   }
 
-  async changePassword(userId, oldPassword: string, newPassword: string){
+  async changePassword(userId, oldPassword: string, newPassword: string) {
     //TODO: Find the user
     const user = await this.UserModel.findById(userId);
     if (!user) {
@@ -89,7 +89,7 @@ export class AuthService {
     await user.save();
   }
 
-  async forgotPassword(email:string){
+  async forgotPassword(email: string) {
     //TODO: Check that user exists
     const user = await this.UserModel.findOne({ email });
 
@@ -102,23 +102,23 @@ export class AuthService {
       await this.ResetTokenModel.create({
         token: resetToken,
         userId: user._id,
-        expiryDate
-      })
+        expiryDate,
+      });
       //TODO: Send the link to the user by email (nodemailer)
       this.mailService.sendPasswordResetEmail(email, resetToken);
     }
 
-    return {"message":"If this user exists, they will receive an email."}
+    return { message: 'If this user exists, they will receive an email.' };
   }
 
-  async resetPassword(newPassword: string, resetToken: string){
+  async resetPassword(newPassword: string, resetToken: string) {
     //TODO: Find a valid reset token document
     const token = await this.ResetTokenModel.findOneAndDelete({
-      token:resetToken,
+      token: resetToken,
       expiryDate: { $gte: new Date() },
     });
 
-    if (!token){
+    if (!token) {
       throw new UnauthorizedException('Invalid link');
     }
     //TODO: Change user password
