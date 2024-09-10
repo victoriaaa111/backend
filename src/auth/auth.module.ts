@@ -7,15 +7,24 @@ import {
   RefreshToken,
   RefreshTokenSchema,
 } from './schemas/refresh-token.schema';
+import { ResetToken, ResetTokenSchema } from './schemas/reset-token.schema';
+import { MailService } from 'src/services/mail.service';
 
 @Module({
   imports: [
     MongooseModule.forFeature([
-      { name: User.name, schema: UserSchema },
-      { name: RefreshToken.name, schema: RefreshTokenSchema },
+      { name: User.name, 
+        schema: UserSchema 
+      },
+      { name: RefreshToken.name, 
+        schema: RefreshTokenSchema 
+      },
+      { name: ResetToken.name, 
+        schema: ResetTokenSchema 
+      },
     ]),
   ],
-  providers: [AuthService],
+  providers: [AuthService, MailService],
   controllers: [AuthController],
 })
 export class AuthModule {}
