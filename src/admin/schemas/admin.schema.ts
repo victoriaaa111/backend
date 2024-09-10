@@ -1,16 +1,12 @@
-import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { Document } from 'mongoose';
 
-@Schema({
-  timestamps: true,
-})
-export class Admin {
-  @Prop()
+@Schema()
+export class Admin extends Document {
+  @Prop({ required: true })
   email: string;
 
-  @Prop()
-  username: string;
-
-  @Prop()
+  @Prop({ required: true, unique: true })
   password: string;
 }
 
