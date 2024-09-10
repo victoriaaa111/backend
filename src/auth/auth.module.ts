@@ -13,15 +13,9 @@ import { MailService } from 'src/services/mail.service';
 @Module({
   imports: [
     MongooseModule.forFeature([
-      { name: User.name, 
-        schema: UserSchema 
-      },
-      { name: RefreshToken.name, 
-        schema: RefreshTokenSchema 
-      },
-      { name: ResetToken.name, 
-        schema: ResetTokenSchema 
-      },
+      { name: User.name, schema: UserSchema },
+      { name: RefreshToken.name, schema: RefreshTokenSchema },
+      { name: ResetToken.name, schema: ResetTokenSchema },
     ]),
   ],
   providers: [AuthService, MailService],
