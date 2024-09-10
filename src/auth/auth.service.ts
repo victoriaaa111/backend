@@ -73,7 +73,7 @@ export class AuthService {
   }
 
   async changePassword(userId, oldPassword: string, newPassword: string) {
-    //TODO: Find the user
+    // Find the user
     const user = await this.UserModel.findById(userId);
     if (!user) {
       throw new NotFoundException('User not found...');
@@ -150,7 +150,7 @@ export class AuthService {
 
     await this.storeRefreshToken(refreshToken, userId);
     return { accessToken, refreshToken };
-  }
+  }i
 
   async storeRefreshToken(token: string, userId) {
     // calculate expiry date 3 days from now
