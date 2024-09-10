@@ -8,6 +8,7 @@ import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { JwtModule } from '@nestjs/jwt';
+import { WorkerModule } from './worker/worker.module';
 import * as process from "node:process";
 
 @Module({
@@ -21,6 +22,7 @@ import * as process from "node:process";
     AdminModule,
     AuthModule,
     UsersModule,
+    WorkerModule,
   ],
   controllers: [AppController],
   providers: [AppService],

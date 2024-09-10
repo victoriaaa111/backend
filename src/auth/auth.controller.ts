@@ -31,8 +31,7 @@ export class AuthController {
     return this.authService.refreshToken(refreshTokenDto.refreshToken);
   }
 
-
-// TODO: Change Password
+  // TODO: Change Password
   @UseGuards(AuthGuard)
   @Put('change-password')
   async changePassword(
@@ -41,24 +40,22 @@ export class AuthController {
   ) {
     return this.authService.changePassword(
       req.userId,
-      changePasswordDto.oldPassword, 
+      changePasswordDto.oldPassword,
       changePasswordDto.newPassword,
     );
   }
 
   @Post('forgot-password')
-  async forgotPassword(@Body() forgotPasswordDto: ForgotPasswordDto){
+  async forgotPassword(@Body() forgotPasswordDto: ForgotPasswordDto) {
     return this.authService.forgotPassword(forgotPasswordDto.email);
   }
 
   //TODO: Reset Password
   @Put('reset-password')
-  async resetPassword(
-    @Body() resetPasswordDto: ResetPasswordDto,
-  ) {
+  async resetPassword(@Body() resetPasswordDto: ResetPasswordDto) {
     return this.authService.resetPassword(
       resetPasswordDto.newPassword,
       resetPasswordDto.resetToken,
-    )
+    );
   }
 }
