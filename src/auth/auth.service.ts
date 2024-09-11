@@ -32,7 +32,7 @@ export class AuthService {
   ) {}
 
   async signup(signupData: SignupDto) {
-    const { email, password, name } = signupData;
+    const { email, password, firstName, lastName, username } = signupData;
     //check if email is in use
     const emailInUse = await this.UserModel.findOne({
       email,
@@ -45,7 +45,9 @@ export class AuthService {
 
     //todo: create user document and save in mongodb
     await this.UserModel.create({
-      name,
+      firstName,
+      lastName,
+      username,
       email,
       password: hashedPassword,
     });
@@ -73,7 +75,7 @@ export class AuthService {
   }
 
   async changePassword(userId, oldPassword: string, newPassword: string) {
-    //TODO: Find the user
+    // Find the user
     const user = await this.UserModel.findById(userId);
     if (!user) {
       throw new NotFoundException('User not found...');
@@ -150,7 +152,7 @@ export class AuthService {
 
     await this.storeRefreshToken(refreshToken, userId);
     return { accessToken, refreshToken };
-  }
+  }i
 
   async storeRefreshToken(token: string, userId) {
     // calculate expiry date 3 days from now
