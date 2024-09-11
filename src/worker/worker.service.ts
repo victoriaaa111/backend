@@ -9,6 +9,7 @@ import mongoose, { Model } from 'mongoose';
 import { WorkerProfile } from './entities/worker-profile.entity';
 import { User } from '../auth/schemas/user.schema';
 import { WorkerServices } from './entities/worker-services.schema';
+import * as diagnostics_channel from "node:diagnostics_channel";
 
 @Injectable()
 export class WorkerService {
@@ -29,12 +30,12 @@ export class WorkerService {
     if (!userInUse) {
       throw new BadRequestException("User doesn't exist");
     }
-    const { name, email } = userInUse;
+    const { username, email } = userInUse;
 
     // Create worker profile
     const worker = await this.WorkerModel.create({
       userId,
-      name,
+      username,
       email,
       contact,
       rating,
@@ -59,7 +60,7 @@ export class WorkerService {
 
   async addService(
     userId: mongoose.Types.ObjectId,
-    serviceData: { service: string; price: number },
+    serviceData: { service: string; serviceDescription: string; price: number },
   ) {
     const worker = await this.WorkerModel.findOne({ userId: userId });
     if (!worker) {
@@ -114,6 +115,7 @@ export class WorkerService {
     if (!worker) {
       throw new NotFoundException('Worker not found');
     }
+
     return this.WorkerModel.findOne({ userId }).populate('services').exec();
   }
 }

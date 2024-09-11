@@ -10,6 +10,8 @@ import {
 import { WorkerService } from './worker.service';
 import { CreateWorkerDto } from './dto/create-worker.dto';
 import { UpdateWorkerDto } from './dto/update-worker.dto';
+import { WorkerDto } from './dto/exclusion.dto';
+import { plainToClass } from 'class-transformer';
 import mongoose from 'mongoose';
 
 @Controller('worker')
@@ -28,7 +30,7 @@ export class WorkerController {
   @Post('add/:userId')
   async addService(
     @Param('userId') userId: string,
-    @Body() serviceData: { service: string; price: number },
+    @Body() serviceData: { service: string; serviceDescription: string; price: number },
   ) {
     try {
       const userObjectId = new mongoose.Types.ObjectId(userId);
@@ -44,12 +46,19 @@ export class WorkerController {
     @Param('userId') userId: string,
     @Param('service') service: string,
   ) {
-    return this.workerService.deleteServiceFromWorker(userId, service);
+    await this.workerService.deleteServiceFromWorker(userId, service);
+    return { message: 'Service deleted successfully.' };
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.workerService.findOne(id);
+  async findOne(@Param('id') id: string) {
+    const worker = await this.workerService.findOne(id);
+
+    // Transform the worker object to WorkerDto
+    const workerDto = plainToClass(WorkerDto, worker, {
+      excludeExtraneousValues: true,
+    });
+    return workerDto;
   }
 
   //

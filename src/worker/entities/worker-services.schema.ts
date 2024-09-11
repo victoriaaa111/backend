@@ -14,6 +14,9 @@ export class WorkerServices extends Document {
   service: string;
 
   @Prop()
+  serviceDescription: string;
+
+  @Prop()
   price: number;
 }
 
