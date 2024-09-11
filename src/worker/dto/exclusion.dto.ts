@@ -11,7 +11,7 @@ export class ServiceDto {
   @Expose()
   price: number;
 
-  @Exclude()
+  @Expose()
   _id: mongoose.Types.ObjectId;
 
   @Exclude()

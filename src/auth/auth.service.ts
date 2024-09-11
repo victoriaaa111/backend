@@ -15,9 +15,14 @@ import { JwtService } from '@nestjs/jwt';
 import { RefreshToken } from './schemas/refresh-token.schema';
 import { ResetToken } from './schemas/reset-token.schema';
 import { v4 as uuidv4 } from 'uuid';
-import { RefreshTokenDto } from './dtos/refresh-token.dto';
 import { nanoid } from 'nanoid';
 import { MailService } from 'src/services/mail.service';
+import { SignupWorkerDto } from './dtos/signup.worker.dto';
+import { Worker } from './schemas/worker.schema';
+import { LoginWorkerDto } from './dtos/login.worker.dto';
+import { RefreshTokenWorker } from './schemas/refresh-token.admin.schema';
+import { Admin } from './schemas/admin.schema';
+import { AdminRefreshToken } from './schemas/admin.refresh-token.dto';
 
 @Injectable()
 export class AuthService {
@@ -27,6 +32,13 @@ export class AuthService {
     private RefreshTokenModel: Model<RefreshToken>,
     @InjectModel(ResetToken.name)
     private ResetTokenModel: Model<ResetToken>,
+    @InjectModel(Worker.name) private WorkerModel: Model<Worker>,
+    @InjectModel(RefreshTokenWorker.name)
+    private RefreshTokenWorkerModel: Model<RefreshTokenWorker>,
+    @InjectModel(Admin.name)
+    private adminModel: Model<Admin>,
+    @InjectModel(AdminRefreshToken.name)
+    private RefreshTokenAdminModel: Model<AdminRefreshToken>,
     private jwtService: JwtService,
     private mailService: MailService,
   ) {}
@@ -50,6 +62,7 @@ export class AuthService {
       username,
       email,
       password: hashedPassword,
+      isActive: true,
     });
   }
 
@@ -60,7 +73,9 @@ export class AuthService {
     if (!user) {
       throw new BadRequestException('Wrong credentials');
     }
-
+    if (user.isActive == false) {
+      throw new BadRequestException('inactive user');
+    }
     //compare entered password with existing password
     const passwordMatch = await bcrypt.compare(password, user.password);
     if (!passwordMatch) {
@@ -80,23 +95,22 @@ export class AuthService {
     if (!user) {
       throw new NotFoundException('User not found...');
     }
-    //TODO: Compare the old password with rhe password in DB
+    //Compare the old password with rhe password in DB
     const passwordMatch = await bcrypt.compare(oldPassword, user.password);
     if (!passwordMatch) {
       throw new UnauthorizedException('Wrong credentials');
     }
-    //TODO: Change user's password (DON'T FORGET TO HASH IT)
-    const newHashedPassword = await bcrypt.hash(newPassword, 10);
-    user.password = newHashedPassword;
+    //Change user's password (DON'T FORGET TO HASH IT)
+    user.password = await bcrypt.hash(newPassword, 10);
     await user.save();
   }
 
   async forgotPassword(email: string) {
-    //TODO: Check that user exists
+    //Check that user exists
     const user = await this.UserModel.findOne({ email });
 
     if (user) {
-      //TODO: If user exists, generate password reset link
+      //If user exists, generate password reset link
       const expiryDate = new Date();
       expiryDate.setHours(expiryDate.getHours() + 1);
 
@@ -106,7 +120,7 @@ export class AuthService {
         userId: user._id,
         expiryDate,
       });
-      //TODO: Send the link to the user by email (nodemailer)
+      //Send the link to the user by email (nodemailer)
       this.mailService.sendPasswordResetEmail(email, resetToken);
     }
 
@@ -114,7 +128,7 @@ export class AuthService {
   }
 
   async resetPassword(newPassword: string, resetToken: string) {
-    //TODO: Find a valid reset token document
+    //Find a valid reset token document
     const token = await this.ResetTokenModel.findOneAndDelete({
       token: resetToken,
       expiryDate: { $gte: new Date() },
@@ -123,7 +137,7 @@ export class AuthService {
     if (!token) {
       throw new UnauthorizedException('Invalid link');
     }
-    //TODO: Change user password
+    //Change user password
     const user = await this.UserModel.findById(token.userId);
     if (!user) {
       throw new InternalServerErrorException();
@@ -152,7 +166,7 @@ export class AuthService {
 
     await this.storeRefreshToken(refreshToken, userId);
     return { accessToken, refreshToken };
-  }i
+  }
 
   async storeRefreshToken(token: string, userId) {
     // calculate expiry date 3 days from now
@@ -160,6 +174,128 @@ export class AuthService {
     expiryDate.setDate(expiryDate.getDate() + 3);
     await this.RefreshTokenModel.updateOne(
       { userId },
+      { $set: { expiryDate, token } },
+      {
+        upsert: true,
+      },
+    );
+  }
+
+  //worker authentication
+
+  async signupWorker(signupData: SignupWorkerDto) {
+    const { email, password, fullName, contact, username } = signupData;
+    //check if email is in use
+    const emailInUse = await this.WorkerModel.findOne({ email });
+    if (emailInUse) {
+      throw new BadRequestException('Email already exists');
+    }
+    //hash password
+    const hashedPassword = await bcrypt.hash(password, 12);
+
+    //create user document an`d save in mongodb
+    await this.WorkerModel.create({
+      fullName,
+      email,
+      contact,
+      username,
+      rating: 0,
+      password: hashedPassword,
+      isActive: true,
+    });
+  }
+
+  //worker login
+  async loginWorker(credentials: LoginWorkerDto) {
+    const { email, password } = credentials;
+    //find if user exists by email
+    const worker = await this.WorkerModel.findOne({ email });
+    if (!worker) {
+      throw new BadRequestException('Wrong credentials');
+    }
+    if (worker.isActive == false) {
+      throw new BadRequestException('inactive user');
+    }
+    //compare entered password with existing password
+    const passwordMatch = await bcrypt.compare(password, worker.password);
+    if (!passwordMatch) {
+      throw new BadRequestException('Wrong credentials');
+    }
+    //generate jwt tokens
+    const tokens = await this.generateWorkerToken(worker._id);
+    return {
+      ...tokens,
+      userId: worker._id,
+    };
+  }
+
+  async generateWorkerToken(workerId) {
+    const accessToken = this.jwtService.sign({ workerId }, { expiresIn: '1h' });
+    const refreshToken = uuidv4();
+
+    await this.storeRefreshToken(refreshToken, workerId);
+    return { accessToken, refreshToken };
+  }
+
+  async refreshTokenWorker(refreshToken: string) {
+    const token = await this.RefreshTokenWorkerModel.findOne({
+      token: refreshToken,
+      expiryDate: { $gte: new Date() },
+    });
+
+    if (!token) {
+      throw new UnauthorizedException('Wrong token');
+    }
+
+    return this.generateUserToken(token.workerId);
+  }
+
+  async loginAdmin(credentials: LoginDto) {
+    const { email, password } = credentials;
+    const admin = await this.adminModel.findOne({ email });
+    if (!admin) {
+      throw new BadRequestException('Invalid email or password');
+    }
+
+    const passwordMatch = await bcrypt.compare(password, admin.password);
+    if (!passwordMatch) {
+      throw new BadRequestException('Invalid email or password');
+    }
+
+    const tokens = await this.generateAdminToken(admin._id);
+    return {
+      ...tokens,
+      adminId: admin._id,
+    };
+  }
+
+  async refreshAdminToken(refreshToken: string) {
+    const token = await this.RefreshTokenAdminModel.findOne({
+      token: refreshToken,
+      expiryDate: { $gte: new Date() },
+    });
+
+    if (!token) {
+      throw new UnauthorizedException('Wrong token');
+    }
+
+    return this.generateAdminToken(token.adminId);
+  }
+
+  async generateAdminToken(adminId) {
+    const accessToken = this.jwtService.sign({ adminId }, { expiresIn: '1h' });
+    const refreshToken = uuidv4();
+
+    await this.storeRefreshToken(refreshToken, adminId);
+    return { accessToken, refreshToken };
+  }
+
+  async storeRefreshAdminToken(token: string, adminId) {
+    // calculate expiry date 3 days from now
+    const expiryDate = new Date();
+    expiryDate.setDate(expiryDate.getDate() + 3);
+    await this.RefreshTokenAdminModel.updateOne(
+      { adminId },
       { $set: { expiryDate, token } },
       {
         upsert: true,
