@@ -4,10 +4,13 @@ import { SignupDto } from './dtos/signup.dto';
 import { LoginDto } from './dtos/login.dto';
 import { RefreshTokenDto } from './dtos/refresh-token.dto';
 import { ChangePasswordDto } from './dtos/change-password.dto';
-// import { AuthGuard } from './guards/auth.guard';
+import { ChangePasswordWorkerDto } from './dtos/change-password.worker.dto';
+import { ChangePasswordAdminDto } from './dtos/change-password.admin.dto';
 import { AuthGuard } from 'src/guards/auth.guard';
 import { ForgotPasswordDto } from './dtos/forgot-password.dto';
+import { ForgotPasswordWorkerDto } from './dtos/forgot-password.worker.dto';
 import { ResetPasswordDto } from './dtos/reset-password.dto';
+import { ResetPasswordWorkerDto } from './dtos/reset-password.worker.dto';
 import { SignupWorkerDto } from './dtos/signup.worker.dto';
 import { LoginWorkerDto } from './dtos/login.worker.dto';
 import { AdminRefreshTokenDto } from './dtos/admin.refresh-token.dto';
@@ -34,7 +37,7 @@ export class AuthController {
     return this.authService.refreshToken(refreshTokenDto.refreshToken);
   }
 
-  //Change Password
+  //Change Password USER
   @UseGuards(AuthGuard)
   @Put('change-password')
   async changePassword(
@@ -48,17 +51,32 @@ export class AuthController {
     );
   }
 
+  //Forgot password USER
   @Post('forgot-password')
   async forgotPassword(@Body() forgotPasswordDto: ForgotPasswordDto) {
     return this.authService.forgotPassword(forgotPasswordDto.email);
   }
 
-  //Reset Password
+  //Reset Password USER
   @Put('reset-password')
   async resetPassword(@Body() resetPasswordDto: ResetPasswordDto) {
     return this.authService.resetPassword(
       resetPasswordDto.newPassword,
       resetPasswordDto.resetToken,
+    );
+  }
+
+  //Change Password ADMIN
+  @UseGuards(AuthGuard)
+  @Put('admin/change-password')
+  async changePasswordAdmin(
+      @Body() changePasswordAdminDto: ChangePasswordAdminDto,
+      @Req() req,
+  ) {
+    return this.authService.changePasswordAdmin(
+        req.adminId,
+        changePasswordAdminDto.oldPassword,
+        changePasswordAdminDto.newPassword,
     );
   }
 
@@ -80,9 +98,34 @@ export class AuthController {
     return this.authService.refreshTokenWorker(refreshTokenDto.refreshToken);
   }
 
-  //todo: Change Password for worker
+  //Change Password WORKER
+  @UseGuards(AuthGuard)
+  @Put('worker/change-password')
+  async changePasswordWorker(
+      @Body() changePasswordWorkerDto: ChangePasswordWorkerDto,
+      @Req() req,
+  ) {
+    return this.authService.changePasswordWorker(
+        req.workerId,
+        changePasswordWorkerDto.oldPassword,
+        changePasswordWorkerDto.newPassword,
+    );
+  }
 
-  //todo: Reset Password for worker
+  //Forgot password WORKER
+  @Post('worker/forgot-password')
+  async forgotPasswordWorker(@Body() forgotPasswordWorkerDto: ForgotPasswordWorkerDto) {
+    return this.authService.forgotPasswordWorker(forgotPasswordWorkerDto.email);
+  }
+
+  //Reset Password WORKER
+  @Put('worker/reset-password')
+  async resetPasswordWorker(@Body() resetPasswordWorkerDto: ResetPasswordWorkerDto) {
+    return this.authService.resetPasswordWorker(
+        resetPasswordWorkerDto.newPassword,
+        resetPasswordWorkerDto.resetToken,
+    );
+  }
 
   //POST Login admin
   @Post('admin/login')

@@ -14,11 +14,12 @@ import {
   RefreshTokenWorker,
   RefreshTokenWorkerSchema,
 } from './schemas/refresh-token.admin.schema';
-import { AdminSchema } from './schemas/admin.schema';
+import { Admin, AdminSchema } from './schemas/admin.schema';
 import {
   AdminRefreshToken,
   AdminRefreshTokenSchema,
 } from './schemas/admin.refresh-token.dto';
+import {ResetWorkerToken, ResetWorkerTokenSchema} from "./schemas/reset-token.worker.schema";
 
 @Module({
   imports: [
@@ -28,7 +29,8 @@ import {
       { name: ResetToken.name, schema: ResetTokenSchema },
       { name: Worker.name, schema: WorkerSchema },
       { name: RefreshTokenWorker.name, schema: RefreshTokenWorkerSchema },
-      { name: 'Admin', schema: AdminSchema },
+      { name: ResetWorkerToken.name, schema: ResetWorkerTokenSchema },
+      { name: Admin.name, schema: AdminSchema },
       { name: AdminRefreshToken.name, schema: AdminRefreshTokenSchema },
     ]),
   ],
