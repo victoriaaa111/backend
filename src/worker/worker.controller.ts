@@ -1,39 +1,35 @@
 import {
-  Controller,
-  Get,
-  Post,
   Body,
-  Patch,
-  Param,
+  Controller,
   Delete,
+  Get,
+  Param,
+  Post,
+  Put,
 } from '@nestjs/common';
 import { WorkerService } from './worker.service';
-import { CreateWorkerDto } from './dto/create-worker.dto';
-import { UpdateWorkerDto } from './dto/update-worker.dto';
 import { WorkerDto } from './dto/exclusion.dto';
 import { plainToClass } from 'class-transformer';
 import mongoose from 'mongoose';
+import { UpdateWorkerDto } from './dto/update-worker.dto';
 
 @Controller('worker')
 export class WorkerController {
   constructor(private readonly workerService: WorkerService) {}
 
-  // @Post('create-worker')
-  // create(@Body() createWorker: CreateWorkerDto) {
-  //   return this.workerService.create(createWorker);
-  // }
-  @Post()
-  async create(@Body() workerDetails: CreateWorkerDto) {
-    return this.workerService.create(workerDetails);
-  }
-
-  @Post('add/:userId')
+  @Post('add/:workerId')
   async addService(
-    @Param('userId') userId: string,
-    @Body() serviceData: { service: string; serviceDescription: string; price: number },
+    @Param('workerId') workerId: string,
+    @Body()
+    serviceData: {
+      id: string;
+      service: string;
+      description: string;
+      price: number;
+    },
   ) {
     try {
-      const userObjectId = new mongoose.Types.ObjectId(userId);
+      const userObjectId = new mongoose.Types.ObjectId(workerId);
 
       return this.workerService.addService(userObjectId, serviceData);
     } catch (error) {
@@ -41,12 +37,12 @@ export class WorkerController {
     }
   }
 
-  @Delete(':userId/service/:service')
+  @Delete(':workerId/service/:serviceId')
   async deleteServiceFromWorker(
-    @Param('userId') userId: string,
-    @Param('service') service: string,
+    @Param('workerId') workerId: string,
+    @Param('serviceId') service: string,
   ) {
-    await this.workerService.deleteServiceFromWorker(userId, service);
+    await this.workerService.deleteServiceFromWorker(workerId, service);
     return { message: 'Service deleted successfully.' };
   }
 
@@ -55,10 +51,18 @@ export class WorkerController {
     const worker = await this.workerService.findOne(id);
 
     // Transform the worker object to WorkerDto
-    const workerDto = plainToClass(WorkerDto, worker, {
+    return plainToClass(WorkerDto, worker, {
       excludeExtraneousValues: true,
     });
-    return workerDto;
+  }
+
+  @Put('edit/:workerId')
+  async editOne(
+    @Param('workerId') workerId: string,
+    @Body() updateWorker: UpdateWorkerDto,
+  ) {
+    const worker = await this.workerService.editOne(workerId, updateWorker);
+    return { message: 'Worker updated successfully.', workerId };
   }
 
   //

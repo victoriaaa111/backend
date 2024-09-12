@@ -1,21 +1,21 @@
-import { Exclude, Expose, Type } from 'class-transformer';
+import { Exclude, Expose, Transform, Type } from "class-transformer";
 import mongoose from 'mongoose';
 
 export class ServiceDto {
   @Expose()
+  _id: string;
+
+  @Expose()
   service: string;
 
   @Expose()
-  serviceDescription: string;
+  description: string;
 
   @Expose()
   price: number;
 
-  @Expose()
-  _id: mongoose.Types.ObjectId;
-
   @Exclude()
-  userId: mongoose.Types.ObjectId;
+  workerId: string;
 
   @Exclude()
   createdAt: Date;
@@ -25,6 +25,13 @@ export class ServiceDto {
 }
 
 export class WorkerDto {
+  @Expose()
+  @Transform(({ value }) => value.toString())
+  _id: string;
+
+  @Expose()
+  fullName: string;
+
   @Expose()
   username: string;
 
@@ -40,12 +47,6 @@ export class WorkerDto {
   @Expose()
   @Type(() => ServiceDto)
   services: ServiceDto[];
-
-  @Exclude()
-  _id: mongoose.Types.ObjectId;
-
-  @Exclude()
-  userId: mongoose.Types.ObjectId;
 
   @Exclude()
   createdAt: Date;

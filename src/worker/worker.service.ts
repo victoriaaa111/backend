@@ -1,96 +1,74 @@
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
-import { CreateWorkerDto } from './dto/create-worker.dto';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import mongoose, { Model } from 'mongoose';
-import { WorkerProfile } from './entities/worker-profile.entity';
 import { User } from '../auth/schemas/user.schema';
 import { WorkerServices } from './entities/worker-services.schema';
-import * as diagnostics_channel from "node:diagnostics_channel";
+import { Worker } from '../auth/schemas/worker.schema';
+import { UpdateWorkerDto } from './dto/update-worker.dto';
 
 @Injectable()
 export class WorkerService {
   constructor(
-    @InjectModel(WorkerProfile.name) private WorkerModel: Model<WorkerProfile>,
+    @InjectModel(Worker.name) private WorkerModel: Model<Worker>,
     @InjectModel(User.name) private UserModel: Model<User>,
     @InjectModel(WorkerServices.name)
     private WorkerServicesModel: Model<WorkerServices>,
   ) {}
 
-  async create(workerDetails: CreateWorkerDto) {
-    const { userId, contact, rating, services } = workerDetails;
-    const workerInUse = await this.WorkerModel.findOne({ userId });
-    if (workerInUse) {
-      throw new BadRequestException('Invalid worker in use');
-    }
-    const userInUse = await this.UserModel.findOne({ _id: userId });
-    if (!userInUse) {
-      throw new BadRequestException("User doesn't exist");
-    }
-    const { username, email } = userInUse;
-
-    // Create worker profile
-    const worker = await this.WorkerModel.create({
-      userId,
-      username,
-      email,
-      contact,
-      rating,
-    });
-
-    // Create services
-    const createdServices = await this.WorkerServicesModel.insertMany(
-      services.map((serviceData) => ({
-        userId: userId,
-        ...serviceData,
-      })),
-    );
-
-    // Link services to worker profile
-    worker.services = createdServices.map(
-      (service) => service._id,
-    ) as mongoose.Types.ObjectId[];
-    await worker.save();
-
-    return worker;
-  }
-
   async addService(
-    userId: mongoose.Types.ObjectId,
-    serviceData: { service: string; serviceDescription: string; price: number },
+    workerId: mongoose.Types.ObjectId,
+    serviceData: {
+      id?: string;
+      service: string;
+      description: string;
+      price: number;
+    },
   ) {
-    const worker = await this.WorkerModel.findOne({ userId: userId });
-    if (!worker) {
-      throw new NotFoundException('Worker not found');
+    try {
+      const worker = await this.WorkerModel.findOne({ _id: workerId });
+      if (!worker) {
+        throw new NotFoundException('Worker not found');
+      }
+
+      if (serviceData.id === null) {
+        const newService = new this.WorkerServicesModel({
+          workerId: workerId,
+          ...serviceData,
+        });
+        const savedService = await newService.save();
+
+        const id = worker._id;
+        await this.WorkerModel.findByIdAndUpdate(
+          id,
+          { $push: { services: savedService._id } },
+          { new: true, useFindAndModify: false },
+        );
+        return { message: 'Service Created' };
+      }
+
+      const service = await this.WorkerServicesModel.findById(serviceData.id);
+      if (!service) {
+        throw new NotFoundException('Service not found');
+      }
+      await this.WorkerServicesModel.findByIdAndUpdate(serviceData.id, {
+        service: serviceData.service,
+        description: serviceData.description,
+        price: serviceData.price,
+      });
+      return { message: 'Service Updated' };
+    } catch (error) {
+      return { message: error.message };
     }
-    const newService = new this.WorkerServicesModel({
-      userId: userId,
-      ...serviceData,
-    });
-
-    const savedService = await newService.save();
-
-    const id = worker._id;
-
-    return this.WorkerModel.findByIdAndUpdate(
-      id,
-      { $push: { services: savedService._id } },
-      { new: true, useFindAndModify: false },
-    );
   }
 
-  async deleteServiceFromWorker(userId: string, service: string) {
-    const worker = await this.WorkerModel.findOne({ userId: userId });
+  async deleteServiceFromWorker(workerId: string, serviceId: string) {
+    const worker = await this.WorkerModel.findOne({ _id: workerId });
     if (!worker) {
       throw new NotFoundException('Worker not found');
     }
 
-    const workerService = await this.WorkerServicesModel.findOne({
-      userId: userId,
-      service: service,
+    const workerService = await this.WorkerServicesModel.findById({
+      _id: serviceId,
     });
     if (!workerService) {
       throw new NotFoundException('Service not found');
@@ -102,20 +80,35 @@ export class WorkerService {
       { $pull: { services: workerService._id } },
     );
 
-    await this.WorkerServicesModel.findOneAndDelete({
-      userId: userId,
-      service: service,
+    await this.WorkerServicesModel.findByIdAndDelete({
+      _id: serviceId,
     });
 
     return worker;
   }
 
-  async findOne(userId: string) {
-    const worker = await this.WorkerModel.findOne({ userId });
+  async findOne(workerId: string) {
+    const worker = await this.WorkerModel.findOne({ _id: workerId });
     if (!worker) {
       throw new NotFoundException('Worker not found');
     }
 
-    return this.WorkerModel.findOne({ userId }).populate('services').exec();
+    return await this.WorkerModel.findOne({ _id: workerId })
+      .populate({
+        path: 'services',
+        select: 'service description price',
+      })
+      .exec();
+  }
+
+  async editOne(workerId: string, updateWorker: UpdateWorkerDto) {
+    const worker = await this.WorkerModel.findById(workerId);
+    if (!worker) {
+      throw new NotFoundException('Worker not found');
+    }
+    return this.WorkerModel.findByIdAndUpdate(workerId, updateWorker, {
+      new: true,
+      useFindAndModify: false,
+    });
   }
 }
