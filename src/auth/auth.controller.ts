@@ -10,7 +10,7 @@ import { ForgotPasswordDto } from './dtos/forgot-password.dto';
 import { ResetPasswordDto } from './dtos/reset-password.dto';
 import { SignupWorkerDto } from './dtos/signup.worker.dto';
 import { LoginWorkerDto } from './dtos/login.worker.dto';
-import { AdminRefreshTokenDto } from "./dtos/admin.refresh-token.dto";
+import { AdminRefreshTokenDto } from './dtos/admin.refresh-token.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -91,6 +91,7 @@ export class AuthController {
   }
   //TODO: POST Refresh Token
   @Post('admin/refresh')
+  // eslint-disable-next-line prettier/prettier
   async refreshTokensAdmin(@Body() refreshTokenDto: AdminRefreshTokenDto) {
     return this.authService.refreshAdminToken(refreshTokenDto.refreshToken);
   }

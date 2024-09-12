@@ -8,13 +8,13 @@ export class WorkerServices extends Document {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'WorkerProfile',
   })
-  userId: mongoose.Types.ObjectId;
+  workerId: mongoose.Types.ObjectId;
 
   @Prop()
   service: string;
 
   @Prop()
-  serviceDescription: string;
+  description: string;
 
   @Prop()
   price: number;

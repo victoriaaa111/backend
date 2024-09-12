@@ -1,33 +1,32 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Get, Put } from '@nestjs/common';
 import { AdminService } from './admin.service';
-import { LoginDto } from '../auth/dtos/admin.login.dto';
-import { AdminRefreshTokenDto } from '../auth/dtos/admin.refresh-token.dto';
+import mongoose from 'mongoose';
 
 @Controller('admin')
 export class AdminController {
   constructor(private adminService: AdminService) {}
 
-  //todo: activate user
-  // @Put('/user/activate')
-  // async activateUser(@Body() id:string) {
-  //   return this.adminService.activateUser(id);
-  // }
+  //change status user
+  @Put('/user/change-status')
+  async changeStatusUser(@Body('id') id: string) {
+    return this.adminService.changeStatusUser(id);
+  }
 
-  //todo: deactivate user
-  // @Put('/user/deactivate')
-  // async deactivateUser(@Body() id:string) {
-  //   return this.adminService.deactivateUser(id);
-  // }
+  //change status worker
+  @Put('/worker/change-status')
+  async changeStatusWorker(@Body('id') id: string) {
+    return this.adminService.changeStatusWorker(id);
+  }
 
-  //todo: activate worker
-  // @Put('/worker/activate')
-  // async activateWorker(@Body() id: string) {
-  //   return this.adminService.activateWorker(id);
-  //}
+  //get all users from database
+  @Get('users')
+  async getUsers() {
+    return this.adminService.getUsers();
+  }
 
-  //todo: deactivate worker
-  // @Put('/worker/deactivate')
-  // async deactivateWorker(@Body() id: string) {
-  //   return this.adminService.deactivateWorker(id);
-  // }
+  //get all workers from database
+  @Get('workers')
+  async getWorkers() {
+    return this.adminService.getWorkers();
+  }
 }
