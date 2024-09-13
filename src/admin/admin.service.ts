@@ -13,6 +13,7 @@ import { User } from '../auth/schemas/user.schema';
 import { Worker } from '../auth/schemas/worker.schema';
 import { UpdateWorkerDto } from './dtos/update-worker.dto';
 import { UpdateUserDto } from './dtos/update-user.dto';
+import { UpdateRatingDto} from "./dtos/worker-rating.dto";
 
 @Injectable()
 export class AdminService {
@@ -86,6 +87,11 @@ export class AdminService {
   }
 
   async updateWorker(id: string, updatedWorker: UpdateWorkerDto) {
+    const worker = this.WorkerModel.findById(id);
+    if (!worker) {
+      throw new NotFoundException('Worker not found');
+    }
+
     await this.WorkerModel.findByIdAndUpdate(id, updatedWorker, {
       new: true,
       useFindAndModify: false,
@@ -94,10 +100,26 @@ export class AdminService {
   }
 
   async updateUser(id: string, updatedUser: UpdateUserDto) {
+    const user = this.UserModel.findById(id);
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
     await this.UserModel.findByIdAndUpdate(id, updatedUser, {
       new: true,
       useFindAndModify: false,
     });
     return { message: 'User updated' };
+  }
+
+  async updateRating(id: string, rating: UpdateRatingDto) {
+    let worker = this.WorkerModel.findById(id);
+    if (!worker) {
+      throw new NotFoundException('Worker not found');
+    }
+    await this.WorkerModel.findByIdAndUpdate(id, rating, {new: true,
+      useFindAndModify: false,})
+    console.log(rating);
+    return { message: 'Rating updated' };
   }
 }
