@@ -6,9 +6,9 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { AdminModule } from './admin/admin.module';
 import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
-import { UsersModule } from './users/users.module';
 import { JwtModule } from '@nestjs/jwt';
 import { WorkerModule } from './worker/worker.module';
+import { UserModule } from './user/user.module';
 import * as process from "node:process";
 
 @Module({
@@ -21,8 +21,8 @@ import * as process from "node:process";
     MongooseModule.forRoot(process.env.DATABASE_URL),
     AdminModule,
     AuthModule,
-    UsersModule,
     WorkerModule,
+    UserModule,
   ],
   controllers: [AppController],
   providers: [AppService],

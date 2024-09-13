@@ -47,7 +47,7 @@ export class AuthService {
   ) {}
 
   async signup(signupData: SignupDto) {
-    const { email, password, firstName, lastName, username } = signupData;
+    const { email, password, fullName, username } = signupData;
     //check if email is in use
     const emailInUse = await this.UserModel.findOne({
       email,
@@ -60,8 +60,7 @@ export class AuthService {
 
     //todo: create user document and save in mongodb
     await this.UserModel.create({
-      firstName,
-      lastName,
+      fullName,
       username,
       email,
       password: hashedPassword,
@@ -150,7 +149,11 @@ export class AuthService {
     await user.save();
   }
 
-  async changePasswordWorker(workerId, oldPassword: string, newPassword: string) {
+  async changePasswordWorker(
+    workerId,
+    oldPassword: string,
+    newPassword: string,
+  ) {
     // Find the user
     const worker = await this.WorkerModel.findById(workerId);
     if (!worker) {
@@ -302,7 +305,7 @@ export class AuthService {
     const tokens = await this.generateWorkerToken(worker._id);
     return {
       ...tokens,
-      userId: worker._id,
+      workerId: worker._id,
     };
   }
 

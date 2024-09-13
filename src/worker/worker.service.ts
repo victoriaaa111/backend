@@ -93,7 +93,7 @@ export class WorkerService {
       throw new NotFoundException('Worker not found');
     }
 
-    return await this.WorkerModel.findOne({ _id: workerId })
+    return this.WorkerModel.findOne({ _id: workerId })
       .populate({
         path: 'services',
         select: 'service description price',

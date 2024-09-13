@@ -61,7 +61,7 @@ export class WorkerController {
     @Param('workerId') workerId: string,
     @Body() updateWorker: UpdateWorkerDto,
   ) {
-    const worker = await this.workerService.editOne(workerId, updateWorker);
+    await this.workerService.editOne(workerId, updateWorker);
     return { message: 'Worker updated successfully.', workerId };
   }
 
