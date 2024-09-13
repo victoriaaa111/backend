@@ -3,6 +3,7 @@ import { AdminService } from './admin.service';
 import mongoose from 'mongoose';
 import { UpdateWorkerDto } from './dtos/update-worker.dto';
 import { UpdateUserDto } from './dtos/update-user.dto';
+import { UpdateRatingDto } from './dtos/worker-rating.dto';
 
 @Controller('admin')
 export class AdminController {
@@ -46,5 +47,13 @@ export class AdminController {
     @Body() updatedUser: UpdateUserDto,
   ) {
     return this.adminService.updateUser(id, updatedUser);
+  }
+
+  @Put('/worker/update-rating/:id')
+  async updateRating(
+      @Param('id') id: string,
+      @Body() updateRating: UpdateRatingDto,
+  ){
+    return this.adminService.updateRating(id, updateRating);
   }
 }
