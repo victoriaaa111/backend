@@ -1,6 +1,8 @@
-import { Body, Controller, Get, Put } from '@nestjs/common';
+import { Body, Controller, Get, Param, Put } from '@nestjs/common';
 import { AdminService } from './admin.service';
 import mongoose from 'mongoose';
+import { UpdateWorkerDto } from './dtos/update-worker.dto';
+import { UpdateUserDto } from './dtos/update-user.dto';
 
 @Controller('admin')
 export class AdminController {
@@ -28,5 +30,21 @@ export class AdminController {
   @Get('workers')
   async getWorkers() {
     return this.adminService.getWorkers();
+  }
+
+  @Put('/worker/update/:id')
+  async updateWorker(
+    @Param('id') id: string,
+    @Body() updatedWorker: UpdateWorkerDto,
+  ) {
+    return this.adminService.updateWorker(id, updatedWorker);
+  }
+
+  @Put('/user/update/:id')
+  async updateUser(
+    @Param('id') id: string,
+    @Body() updatedUser: UpdateUserDto,
+  ) {
+    return this.adminService.updateUser(id, updatedUser);
   }
 }

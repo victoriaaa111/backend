@@ -70,13 +70,13 @@ export class AuthController {
   @UseGuards(AuthGuard)
   @Put('admin/change-password')
   async changePasswordAdmin(
-      @Body() changePasswordAdminDto: ChangePasswordAdminDto,
-      @Req() req,
+    @Body() changePasswordAdminDto: ChangePasswordAdminDto,
+    @Req() req,
   ) {
     return this.authService.changePasswordAdmin(
-        req.adminId,
-        changePasswordAdminDto.oldPassword,
-        changePasswordAdminDto.newPassword,
+      req.adminId,
+      changePasswordAdminDto.oldPassword,
+      changePasswordAdminDto.newPassword,
     );
   }
 
@@ -102,28 +102,32 @@ export class AuthController {
   @UseGuards(AuthGuard)
   @Put('worker/change-password')
   async changePasswordWorker(
-      @Body() changePasswordWorkerDto: ChangePasswordWorkerDto,
-      @Req() req,
+    @Body() changePasswordWorkerDto: ChangePasswordWorkerDto,
+    @Req() req,
   ) {
     return this.authService.changePasswordWorker(
-        req.workerId,
-        changePasswordWorkerDto.oldPassword,
-        changePasswordWorkerDto.newPassword,
+      req.workerId,
+      changePasswordWorkerDto.oldPassword,
+      changePasswordWorkerDto.newPassword,
     );
   }
 
   //Forgot password WORKER
   @Post('worker/forgot-password')
-  async forgotPasswordWorker(@Body() forgotPasswordWorkerDto: ForgotPasswordWorkerDto) {
+  async forgotPasswordWorker(
+    @Body() forgotPasswordWorkerDto: ForgotPasswordWorkerDto,
+  ) {
     return this.authService.forgotPasswordWorker(forgotPasswordWorkerDto.email);
   }
 
   //Reset Password WORKER
   @Put('worker/reset-password')
-  async resetPasswordWorker(@Body() resetPasswordWorkerDto: ResetPasswordWorkerDto) {
+  async resetPasswordWorker(
+    @Body() resetPasswordWorkerDto: ResetPasswordWorkerDto,
+  ) {
     return this.authService.resetPasswordWorker(
-        resetPasswordWorkerDto.newPassword,
-        resetPasswordWorkerDto.resetToken,
+      resetPasswordWorkerDto.newPassword,
+      resetPasswordWorkerDto.resetToken,
     );
   }
 

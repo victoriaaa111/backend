@@ -11,6 +11,8 @@ import { JwtService } from '@nestjs/jwt';
 import { AdminRefreshToken } from '../auth/schemas/admin.refresh-token.dto';
 import { User } from '../auth/schemas/user.schema';
 import { Worker } from '../auth/schemas/worker.schema';
+import { UpdateWorkerDto } from './dtos/update-worker.dto';
+import { UpdateUserDto } from './dtos/update-user.dto';
 
 @Injectable()
 export class AdminService {
@@ -81,5 +83,21 @@ export class AdminService {
       path: 'services',
       select: 'service description price',
     });
+  }
+
+  async updateWorker(id: string, updatedWorker: UpdateWorkerDto) {
+    await this.WorkerModel.findByIdAndUpdate(id, updatedWorker, {
+      new: true,
+      useFindAndModify: false,
+    });
+    return { message: 'Worker updated' };
+  }
+
+  async updateUser(id: string, updatedUser: UpdateUserDto) {
+    await this.UserModel.findByIdAndUpdate(id, updatedUser, {
+      new: true,
+      useFindAndModify: false,
+    });
+    return { message: 'User updated' };
   }
 }
