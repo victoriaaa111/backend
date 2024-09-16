@@ -9,11 +9,17 @@ export class Worker extends Document {
   @Prop({ required: true })
   email: string;
 
-  @Prop({ required: true, unique: true })
-  username: string;
+  @Prop({ required: true })
+  uniqueId: string;
 
   @Prop({ required: true })
   contact: number;
+
+  @Prop({ required: true, default: '7' })
+  startWork: number;
+
+  @Prop({ required: true, default: '19' })
+  endWork: number;
 
   @Prop()
   rating: number;

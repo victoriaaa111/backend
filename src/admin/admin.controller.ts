@@ -51,9 +51,9 @@ export class AdminController {
 
   @Put('/worker/update-rating/:id')
   async updateRating(
-      @Param('id') id: string,
-      @Body() updateRating: UpdateRatingDto,
-  ){
+    @Param('id') id: string,
+    @Body() updateRating: UpdateRatingDto,
+  ) {
     return this.adminService.updateRating(id, updateRating);
   }
 }

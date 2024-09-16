@@ -1,4 +1,4 @@
-import { Exclude, Expose, Transform, Type } from "class-transformer";
+import { Exclude, Expose, Transform, Type } from 'class-transformer';
 import mongoose from 'mongoose';
 
 export class ServiceDto {
@@ -33,7 +33,7 @@ export class WorkerDto {
   fullName: string;
 
   @Expose()
-  username: string;
+  uniqueId: string;
 
   @Expose()
   email: string;

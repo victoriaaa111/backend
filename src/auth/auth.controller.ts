@@ -86,13 +86,13 @@ export class AuthController {
     return this.authService.signupWorker(signupWorkerDate);
   }
 
-  //todo: POST Login for worker
+  //POST Login for worker
   @Post('worker/login')
   async loginWorker(@Body() credentials: LoginWorkerDto) {
     return this.authService.loginWorker(credentials);
   }
 
-  //todo: Refresh Token for worker
+  //Refresh Token for worker
   @Post('worker/refresh')
   async refreshTokensWorker(@Body() refreshTokenDto: RefreshTokenDto) {
     return this.authService.refreshTokenWorker(refreshTokenDto.refreshToken);

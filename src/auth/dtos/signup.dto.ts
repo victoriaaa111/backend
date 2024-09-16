@@ -4,9 +4,6 @@ export class SignupDto {
   @IsString()
   fullName: string;
 
-  @IsString()
-  username: string;
-
   @IsEmail()
   email: string;
 

@@ -3,10 +3,8 @@ import {
   IsNumber,
   IsOptional,
   IsPhoneNumber,
-  IsString,
-  Min,
-  Max,
-} from 'class-validator';
+  IsString, Max, Min
+} from "class-validator";
 
 export class UpdateWorkerDto {
   @IsOptional()
@@ -19,10 +17,18 @@ export class UpdateWorkerDto {
   email?: string;
 
   @IsOptional()
-  @IsString()
-  username?: string;
-
-  @IsOptional()
   @IsPhoneNumber()
   contact?: number;
+
+  @IsOptional()
+  @IsNumber()
+  @Max(24)
+  @Min(0)
+  startWork?: number;
+
+  @IsOptional()
+  @IsNumber()
+  @Max(24)
+  @Min(0)
+  endWork?: number;
 }
