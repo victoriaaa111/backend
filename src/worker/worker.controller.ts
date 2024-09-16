@@ -12,6 +12,7 @@ import { WorkerDto } from './dto/exclusion.dto';
 import { plainToClass } from 'class-transformer';
 import mongoose, { ObjectId } from 'mongoose';
 import { UpdateWorkerDto } from './dto/update-worker.dto';
+import { OrderStatusDto } from "./dto/order.status.dto";
 
 @Controller('worker')
 export class WorkerController {
@@ -70,19 +71,11 @@ export class WorkerController {
     return this.workerService.findOrders(id);
   }
 
-  //
-  // @Get()
-  // findAll() {
-  //   return this.workerService.findAll();
-  // }
-  //
-  // @Patch(':id')
-  // update(@Param('id') id: string, @Body() updateWorkerDto: UpdateWorkerDto) {
-  //   return this.workerService.update(+id, updateWorkerDto);
-  // }
-  //
-  // @Delete(':id')
-  // remove(@Param('id') id: string) {
-  //   return this.workerService.remove(+id);
-  // }
+  @Put('/executed-status-change/:id')
+  async executedStatusChange(
+    @Param('id') id: ObjectId,
+    @Body() orderStatus: OrderStatusDto,
+  ) {
+    return this.workerService.executedStatusChange(id, orderStatus);
+  }
 }
