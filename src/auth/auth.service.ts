@@ -47,7 +47,7 @@ export class AuthService {
   ) {}
 
   async signup(signupData: SignupDto) {
-    const { email, password, fullName, username } = signupData;
+    const { email, password, fullName } = signupData;
     //check if email is in use
     const emailInUse = await this.UserModel.findOne({
       email,
@@ -57,11 +57,12 @@ export class AuthService {
     }
     //hash password
     const hashedPassword = await bcrypt.hash(password, 12);
-
+    let unique = uuidv4();
+    unique = unique.replace(/-/g, '').substr(0, 6);
     //todo: create user document and save in mongodb
     await this.UserModel.create({
       fullName,
-      username,
+      uniqueId: unique,
       email,
       password: hashedPassword,
       isActive: true,
@@ -264,7 +265,7 @@ export class AuthService {
   //worker authentication
 
   async signupWorker(signupData: SignupWorkerDto) {
-    const { email, password, fullName, contact, username } = signupData;
+    const { email, password, fullName, contact } = signupData;
     //check if email is in use
     const emailInUse = await this.WorkerModel.findOne({ email });
     if (emailInUse) {
@@ -272,13 +273,14 @@ export class AuthService {
     }
     //hash password
     const hashedPassword = await bcrypt.hash(password, 12);
-
+    let unique = uuidv4();
+    unique = unique.replace(/-/g, '').substr(0, 6);
     //create user document an`d save in mongodb
     await this.WorkerModel.create({
       fullName,
       email,
       contact,
-      username,
+      uniqueId: unique,
       rating: 0,
       password: hashedPassword,
       isActive: true,

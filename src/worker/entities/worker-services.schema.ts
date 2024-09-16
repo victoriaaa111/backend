@@ -6,7 +6,7 @@ export class WorkerServices extends Document {
   @Prop({
     required: true,
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'WorkerProfile',
+    ref: 'Worker',
   })
   workerId: mongoose.Types.ObjectId;
 

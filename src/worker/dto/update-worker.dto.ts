@@ -1,4 +1,11 @@
-import { IsOptional, IsPhoneNumber, IsString } from "class-validator";
+import {
+  IsNumber,
+  IsOptional,
+  IsPhoneNumber,
+  IsString,
+  Max,
+  Min,
+} from 'class-validator';
 
 export class UpdateWorkerDto {
   @IsOptional()
@@ -6,6 +13,18 @@ export class UpdateWorkerDto {
   fullName?: string;
 
   @IsOptional()
-  @IsPhoneNumber()
+  @IsPhoneNumber('MD')
   contact?: number;
+
+  @IsOptional()
+  @IsNumber()
+  @Max(24)
+  @Min(0)
+  startWork?: number;
+
+  @IsOptional()
+  @IsNumber()
+  @Max(24)
+  @Min(0)
+  endWork?: number;
 }
