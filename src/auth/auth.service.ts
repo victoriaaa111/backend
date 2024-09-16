@@ -59,7 +59,7 @@ export class AuthService {
     const hashedPassword = await bcrypt.hash(password, 12);
     let unique = uuidv4();
     unique = unique.replace(/-/g, '').substr(0, 6);
-    //todo: create user document and save in mongodb
+    //create user document and save in mongodb
     await this.UserModel.create({
       fullName,
       uniqueId: unique,

@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { User } from '../auth/schemas/user.schema';
-import { Model, Types, Schema } from 'mongoose';
+import { Model, Types, Schema, ObjectId } from "mongoose";
 import { OrderDto } from './dto/order.dto';
 import { Worker } from '../auth/schemas/worker.schema';
 import { WorkerServices } from '../worker/entities/worker-services.schema';
@@ -96,10 +96,17 @@ export class UserService {
     // Find overlapping orders for the same worker
     const overlappingOrders = await this.OrderModel.find({
       workerId,
-      status: { $ne: 'Decline' },
+      status: { $ne: 'Declined' },
       $or: [{ startDate: { $lt: endDate }, endDate: { $gt: startDate } }],
     });
 
     return overlappingOrders.length === 0;
+  }
+
+  async findOrders(id: ObjectId) {
+    return this.OrderModel.find({ userId: id }).populate(
+      'workerId',
+      'fullName',
+    );
   }
 }

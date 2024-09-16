@@ -1,10 +1,11 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import mongoose, { Model } from 'mongoose';
+import mongoose, { Model, ObjectId } from 'mongoose';
 import { User } from '../auth/schemas/user.schema';
 import { WorkerServices } from './entities/worker-services.schema';
 import { Worker } from '../auth/schemas/worker.schema';
 import { UpdateWorkerDto } from './dto/update-worker.dto';
+import { Order } from '../user/entities/order.schema';
 
 @Injectable()
 export class WorkerService {
@@ -13,6 +14,7 @@ export class WorkerService {
     @InjectModel(User.name) private UserModel: Model<User>,
     @InjectModel(WorkerServices.name)
     private WorkerServicesModel: Model<WorkerServices>,
+    @InjectModel(Order.name) private OrderModel: Model<Order>,
   ) {}
 
   async addService(
@@ -110,5 +112,9 @@ export class WorkerService {
       new: true,
       useFindAndModify: false,
     });
+  }
+
+  async findOrders(id: ObjectId) {
+    return this.OrderModel.find({ workerId: id });
   }
 }

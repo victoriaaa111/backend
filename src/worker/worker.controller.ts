@@ -10,7 +10,7 @@ import {
 import { WorkerService } from './worker.service';
 import { WorkerDto } from './dto/exclusion.dto';
 import { plainToClass } from 'class-transformer';
-import mongoose from 'mongoose';
+import mongoose, { ObjectId } from 'mongoose';
 import { UpdateWorkerDto } from './dto/update-worker.dto';
 
 @Controller('worker')
@@ -63,6 +63,11 @@ export class WorkerController {
   ) {
     await this.workerService.editOne(workerId, updateWorker);
     return { message: 'Worker updated successfully.', workerId };
+  }
+
+  @Get('/orders/:id')
+  async findOrders(@Param('id') id: ObjectId) {
+    return this.workerService.findOrders(id);
   }
 
   //
