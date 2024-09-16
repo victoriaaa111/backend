@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from "@nestjs/common";
 import { InjectModel } from '@nestjs/mongoose';
 import mongoose, { Model, ObjectId } from 'mongoose';
 import { User } from '../auth/schemas/user.schema';
@@ -6,6 +6,7 @@ import { WorkerServices } from './entities/worker-services.schema';
 import { Worker } from '../auth/schemas/worker.schema';
 import { UpdateWorkerDto } from './dto/update-worker.dto';
 import { Order } from '../user/entities/order.schema';
+import { OrderStatusDto } from "./dto/order.status.dto";
 
 @Injectable()
 export class WorkerService {
@@ -116,5 +117,52 @@ export class WorkerService {
 
   async findOrders(id: ObjectId) {
     return this.OrderModel.find({ workerId: id });
+  }
+
+  async executedStatusChange(id: ObjectId, orderStatus: OrderStatusDto) {
+    const order = await this.OrderModel.findById(id);
+    if (!order) {
+      throw new NotFoundException('Order not found');
+    }
+    if (order.status === 'Pending') {
+      if (
+        orderStatus.status === 'In Progress' ||
+        orderStatus.status === 'Declined'
+      ) {
+        await this.OrderModel.findOneAndUpdate(
+          { _id: id },
+          { status: orderStatus.status },
+        );
+        return { message: 'Status has been changed' };
+      } else
+        throw new BadRequestException(
+          'Status transitions should follow logical steps, such as: "Pending" → "In Progress", "In Progress" → "Done"',
+        );
+    }
+
+    if (order.status === 'In Progress') {
+      if (orderStatus.status === 'Done') {
+        await this.OrderModel.findOneAndUpdate(
+          { _id: id },
+          { status: orderStatus.status },
+        );
+        return { message: 'Status has been changed' };
+      } else
+        throw new BadRequestException(
+          'Status transitions should follow logical steps, such as: "Pending" → "In Progress", "In Progress" → "Done"',
+        );
+    }
+
+    if (order.status === 'Declined') {
+      throw new BadRequestException(
+        'Status can not be changed the order was declined',
+      );
+    }
+
+    if (order.status === 'Done') {
+      throw new BadRequestException(
+        'Status can not be changed the order was Done',
+      );
+    }
   }
 }
