@@ -49,9 +49,10 @@ export class WorkerController {
 
   @Get(':id')
   async findOne(@Param('id') id: string) {
-    const worker = await this.workerService.findOne(id);
+    const worker = await this.workerService.findOne(id)
 
     // Transform the worker object to WorkerDto
+    // return worker;
     return plainToClass(WorkerDto, worker, {
       excludeExtraneousValues: true,
     });

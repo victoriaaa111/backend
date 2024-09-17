@@ -55,7 +55,6 @@ export class UserService {
         'The worker is not available during the requested time slot.',
       );
     }
-    console.log(workerId);
     // Retrieve worker's working hours
     const worker = await this.WorkerModel.findById(workerId);
     if (!worker) {
@@ -65,7 +64,6 @@ export class UserService {
     // Check if the order's execution time is within worker's working hours
     const startHour = orderInfo.startDate.getHours();
     const endHour = orderInfo.endDate.getHours();
-    console.log(startHour, endHour);
     if (startHour < worker.startWork || endHour > worker.endWork) {
       throw new BadRequestException(
         "The order time is outside the worker's working hours.",
