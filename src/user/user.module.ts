@@ -9,6 +9,7 @@ import {
   WorkerServicesSchema,
 } from '../worker/entities/worker-services.schema';
 import { Order, OrderSchema } from './entities/order.schema';
+import { Review, ReviewSchema } from './entities/review.schema';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { Order, OrderSchema } from './entities/order.schema';
       { name: Worker.name, schema: WorkerSchema },
       { name: WorkerServices.name, schema: WorkerServicesSchema },
       { name: Order.name, schema: OrderSchema },
+      { name: Review.name, schema: ReviewSchema },
     ]),
   ],
   controllers: [UserController],

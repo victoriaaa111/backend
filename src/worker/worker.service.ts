@@ -80,6 +80,15 @@ export class WorkerService {
     if (!workerService) {
       throw new NotFoundException('Service not found');
     }
+    const service = await this.WorkerServicesModel.findById(serviceId);
+    if (!service) {
+      throw new NotFoundException('Service not found');
+    }
+    if (worker._id.toString() !== service.workerId.toString()) {
+      throw new BadRequestException(
+        'The service dose not belong to this worker',
+      );
+    }
 
     // Remove the service from the worker's services array
     await this.WorkerModel.updateOne(
