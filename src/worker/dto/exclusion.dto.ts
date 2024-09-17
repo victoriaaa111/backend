@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 
 export class ServiceDto {
   @Expose()
+  @Transform(({ obj }) => obj._id.toString(), { toClassOnly: true })
   _id: string;
 
   @Expose()
@@ -15,7 +16,7 @@ export class ServiceDto {
   price: number;
 
   @Exclude()
-  workerId: string;
+  workerId: mongoose.Types.ObjectId;
 
   @Exclude()
   createdAt: Date;
@@ -26,7 +27,7 @@ export class ServiceDto {
 
 export class WorkerDto {
   @Expose()
-  @Transform(({ value }) => value.toString())
+  @Transform(({ obj }) => obj._id.toString(), { toClassOnly: true })
   _id: string;
 
   @Expose()
@@ -47,6 +48,12 @@ export class WorkerDto {
   @Expose()
   @Type(() => ServiceDto)
   services: ServiceDto[];
+
+  @Expose()
+  startWork: number;
+
+  @Expose()
+  endWork: number;
 
   @Exclude()
   createdAt: Date;

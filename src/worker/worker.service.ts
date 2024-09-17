@@ -11,6 +11,7 @@ import { Worker } from '../auth/schemas/worker.schema';
 import { UpdateWorkerDto } from './dto/update-worker.dto';
 import { Order } from '../user/entities/order.schema';
 import { OrderStatusDto } from './dto/order.status.dto';
+import * as path from "node:path";
 
 @Injectable()
 export class WorkerService {
@@ -108,13 +109,11 @@ export class WorkerService {
     if (!worker) {
       throw new NotFoundException('Worker not found');
     }
-
-    return this.WorkerModel.findOne({ _id: workerId })
-      .populate({
-        path: 'services',
-        select: 'service description price',
-      })
-      .exec();
+    // return this.WorkerModel.findById(workerId);
+    return this.WorkerModel.findById(workerId).populate({
+      path: 'services',
+      select: 'id service description price',
+    });
   }
 
   async editOne(workerId: string, updateWorker: UpdateWorkerDto) {
