@@ -19,7 +19,10 @@ import {
   AdminRefreshToken,
   AdminRefreshTokenSchema,
 } from './schemas/admin.refresh-token.dto';
-import {ResetWorkerToken, ResetWorkerTokenSchema} from "./schemas/reset-token.worker.schema";
+import {
+  ResetWorkerToken,
+  ResetWorkerTokenSchema,
+} from './schemas/reset-token.worker.schema';
 
 @Module({
   imports: [

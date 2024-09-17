@@ -39,7 +39,7 @@ export class WorkerService {
 
       if (serviceData.id === null) {
         const newService = new this.WorkerServicesModel({
-          workerId: workerId,
+          workerId: worker._id,
           ...serviceData,
         });
         const savedService = await newService.save();
