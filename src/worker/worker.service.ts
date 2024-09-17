@@ -11,7 +11,6 @@ import { Worker } from '../auth/schemas/worker.schema';
 import { UpdateWorkerDto } from './dto/update-worker.dto';
 import { Order } from '../user/entities/order.schema';
 import { OrderStatusDto } from './dto/order.status.dto';
-import * as path from "node:path";
 
 @Injectable()
 export class WorkerService {
