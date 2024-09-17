@@ -5,13 +5,15 @@ import {
   Body,
   Patch,
   Param,
-  Delete, Put
-} from "@nestjs/common";
+  Delete,
+  Put,
+} from '@nestjs/common';
 import { UserService } from './user.service';
 import { OrderDto } from './dto/order.dto';
 import { ObjectId } from 'mongoose';
 import { TimeDto } from './dto/time.dto';
-import { IdDto } from "./dto/userId.dto";
+import { IdDto } from './dto/userId.dto';
+import { ReviewDto } from './dto/review.dto';
 
 @Controller('user')
 export class UserController {
@@ -43,5 +45,10 @@ export class UserController {
     @Body() date: TimeDto,
   ) {
     return this.userService.findWorkerAvailability(id, date);
+  }
+
+  @Post('add-review')
+  async addReview(@Body() reviewInfo: ReviewDto) {
+    return this.userService.addReview(reviewInfo);
   }
 }

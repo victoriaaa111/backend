@@ -1,6 +1,5 @@
 import { Body, Controller, Get, Param, Put } from '@nestjs/common';
 import { AdminService } from './admin.service';
-import mongoose from 'mongoose';
 import { UpdateWorkerDto } from './dtos/update-worker.dto';
 import { UpdateUserDto } from './dtos/update-user.dto';
 import { UpdateRatingDto } from './dtos/worker-rating.dto';

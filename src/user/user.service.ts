@@ -11,9 +11,9 @@ import { Worker } from '../auth/schemas/worker.schema';
 import { WorkerServices } from '../worker/entities/worker-services.schema';
 import { Order } from './entities/order.schema';
 import { TimeDto } from './dto/time.dto';
-import { OrderStatusDto } from "../worker/dto/order.status.dto";
-import { IdDto } from "./dto/userId.dto";
-import { use } from "passport";
+import { IdDto } from './dto/userId.dto';
+import { ReviewDto } from './dto/review.dto';
+import { Review } from './entities/review.schema';
 
 @Injectable()
 export class UserService {
@@ -23,6 +23,7 @@ export class UserService {
     @InjectModel(WorkerServices.name)
     private WorkerServicesModel: Model<WorkerServices>,
     @InjectModel(Order.name) private OrderModel: Model<Order>,
+    @InjectModel(Review.name) private ReviewModel: Model<Review>,
   ) {}
 
   async findOne(id: string) {
@@ -168,5 +169,43 @@ export class UserService {
     }
 
     return freeHours;
+  }
+
+  async addReview(reviewInfo: ReviewDto) {
+    const order = await this.OrderModel.findById(reviewInfo.orderId);
+    if (!order) {
+      throw new NotFoundException('Order not found');
+    }
+
+    if (reviewInfo.userId !== order.userId.toString()) {
+      throw new BadRequestException('This order dose not belong to this user');
+    }
+
+    const reviewInUse = await this.ReviewModel.findOne({
+      userId: reviewInfo.userId,
+      orderId: reviewInfo.orderId,
+    });
+    if (order.status !== 'Done') {
+      throw new BadRequestException(
+        'You can not leave a review if the order have not been done',
+      );
+    }
+
+    if (reviewInUse) {
+      throw new BadRequestException(
+        'The user has created an review for this order',
+      );
+    }
+
+    const date = new Date();
+
+    await this.ReviewModel.create({
+      userId: reviewInfo.userId,
+      workerId: order.workerId,
+      orderId: reviewInfo.orderId,
+      rating: reviewInfo.rating,
+      comment: reviewInfo.comment,
+      date: date,
+    });
   }
 }
