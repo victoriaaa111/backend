@@ -12,7 +12,7 @@ import { WorkerDto } from './dto/exclusion.dto';
 import { plainToClass } from 'class-transformer';
 import mongoose, { ObjectId } from 'mongoose';
 import { UpdateWorkerDto } from './dto/update-worker.dto';
-import { OrderStatusDto } from "./dto/order.status.dto";
+import { OrderStatusDto } from './dto/order.status.dto';
 
 @Controller('worker')
 export class WorkerController {
