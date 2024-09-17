@@ -5,11 +5,15 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { User } from '../auth/schemas/user.schema';
-import { Model, Types, Schema, ObjectId } from "mongoose";
+import { Model, Types, ObjectId } from 'mongoose';
 import { OrderDto } from './dto/order.dto';
 import { Worker } from '../auth/schemas/worker.schema';
 import { WorkerServices } from '../worker/entities/worker-services.schema';
 import { Order } from './entities/order.schema';
+import { TimeDto } from './dto/time.dto';
+import { OrderStatusDto } from "../worker/dto/order.status.dto";
+import { IdDto } from "./dto/userId.dto";
+import { use } from "passport";
 
 @Injectable()
 export class UserService {
@@ -96,7 +100,7 @@ export class UserService {
     // Find overlapping orders for the same worker
     const overlappingOrders = await this.OrderModel.find({
       workerId,
-      status: { $ne: 'Declined' },
+      status: { $nin: ['Declined', 'Canceled'] },
       $or: [{ startDate: { $lt: endDate }, endDate: { $gt: startDate } }],
     });
 
@@ -108,5 +112,61 @@ export class UserService {
       'workerId',
       'fullName',
     );
+  }
+
+  async cancelOrder(id: ObjectId, userId: IdDto) {
+    const order = await this.OrderModel.findById(id);
+    if (!order) {
+      throw new NotFoundException('Order not found');
+    }
+
+    if (order.userId.toString() !== userId.userId) {
+      throw new BadRequestException('The order dose not belong to this user');
+    }
+    if (order.status !== 'Pending') {
+      throw new BadRequestException('The user can not change the status');
+    }
+    await this.OrderModel.findByIdAndUpdate(id, {
+      status: 'Canceled',
+    });
+    return { message: 'The order has been cancelled' };
+  }
+
+  async findWorkerAvailability(id: ObjectId, date: TimeDto) {
+    const worker = await this.WorkerModel.findById(id);
+    if (!worker) {
+      throw new NotFoundException('Worker not found');
+    }
+    // Get start and end of the day based on worker's working hours
+    const startOfDay = new Date(date.date);
+    startOfDay.setHours(worker.startWork + 3, 0, 0, 0);
+    const endOfDay = new Date(date.date);
+    endOfDay.setHours(worker.endWork + 3, 0, 0, 0);
+
+    // Retrieve all orders for the worker on the specified day
+    const orders = await this.OrderModel.find({
+      workerId: id,
+      startDate: { $gte: startOfDay },
+      endDate: { $lte: endOfDay },
+      status: { $nin: ['Declined', 'Canceled'] },
+    }).sort('startDate');
+
+    // Calculate free hours between orders
+    const freeHours = [];
+    let lastEnd = startOfDay;
+
+    for (const order of orders) {
+      if (order.startDate > lastEnd) {
+        freeHours.push({ start: lastEnd, end: order.startDate });
+      }
+      lastEnd = order.endDate;
+    }
+
+    // Add remaining time after the last order
+    if (lastEnd < endOfDay) {
+      freeHours.push({ start: lastEnd, end: endOfDay });
+    }
+
+    return freeHours;
   }
 }

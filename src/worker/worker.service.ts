@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable, NotFoundException } from "@nestjs/common";
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import mongoose, { Model, ObjectId } from 'mongoose';
 import { User } from '../auth/schemas/user.schema';
@@ -6,7 +10,7 @@ import { WorkerServices } from './entities/worker-services.schema';
 import { Worker } from '../auth/schemas/worker.schema';
 import { UpdateWorkerDto } from './dto/update-worker.dto';
 import { Order } from '../user/entities/order.schema';
-import { OrderStatusDto } from "./dto/order.status.dto";
+import { OrderStatusDto } from './dto/order.status.dto';
 
 @Injectable()
 export class WorkerService {

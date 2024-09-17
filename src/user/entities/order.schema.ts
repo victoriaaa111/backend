@@ -19,7 +19,7 @@ export class Order extends Document {
 
   @Prop({
     required: true,
-    enum: ['Pending', 'Declined', 'In Progress', 'Done'],
+    enum: ['Pending', 'Canceled', 'Declined', 'In Progress', 'Done'],
     default: 'Pending',
   })
   status: string;
