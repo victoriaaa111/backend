@@ -6,8 +6,8 @@ import {
   Get,
   Param,
   Post,
-  Put
-} from "@nestjs/common";
+  Put,
+} from '@nestjs/common';
 import { WorkerService } from './worker.service';
 import { WorkerDto } from './dto/exclusion.dto';
 import { plainToClass } from 'class-transformer';
@@ -15,7 +15,6 @@ import mongoose, { ObjectId } from 'mongoose';
 import { UpdateWorkerDto } from './dto/update-worker.dto';
 import { OrderStatusDto } from './dto/order.status.dto';
 import { ServiceDto } from './dto/service.dto';
-import { SearchWorkerDto } from './dto/search-worker.dto';
 
 @Controller('worker')
 export class WorkerController {
@@ -76,21 +75,5 @@ export class WorkerController {
     @Body() orderStatus: OrderStatusDto,
   ) {
     return this.workerService.executedStatusChange(id, orderStatus);
-  }
-
-  @Get('search')
-  async searchWorkers(@Body() searchWorkerDto: SearchWorkerDto) {
-    try {
-      const workers = await this.workerService.searchWorkers(searchWorkerDto);
-
-      // Transform the array of workers to an array of WorkerDto
-      return workers.map((worker) =>
-        plainToClass(WorkerDto, worker, {
-          excludeExtraneousValues: true,
-        }),
-      );
-    } catch (error) {
-      throw new BadRequestException(error.message);
-    }
   }
 }
