@@ -1,32 +1,34 @@
 import {
   IsEmail,
+  IsNotEmpty,
   IsNumber,
-  IsOptional,
   IsPhoneNumber,
-  IsString, Max, Min
-} from "class-validator";
+  IsString,
+  Max,
+  Min,
+} from 'class-validator';
 
 export class UpdateWorkerDto {
-  @IsOptional()
+  @IsNotEmpty()
   @IsString()
   fullName?: string;
 
-  @IsOptional()
+  @IsNotEmpty()
   @IsEmail()
   @IsString()
   email?: string;
 
-  @IsOptional()
+  @IsNotEmpty()
   @IsPhoneNumber()
   contact?: number;
 
-  @IsOptional()
+  @IsNotEmpty()
   @IsNumber()
   @Max(24)
   @Min(0)
   startWork?: number;
 
-  @IsOptional()
+  @IsNotEmpty()
   @IsNumber()
   @Max(24)
   @Min(0)

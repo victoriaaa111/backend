@@ -1,4 +1,5 @@
 import {
+  IsNotEmpty,
   IsNumber,
   IsOptional,
   IsPhoneNumber,
@@ -8,21 +9,21 @@ import {
 } from 'class-validator';
 
 export class UpdateWorkerDto {
-  @IsOptional()
+  @IsNotEmpty()
   @IsString()
   fullName?: string;
 
-  @IsOptional()
+  @IsNotEmpty()
   @IsPhoneNumber('MD')
   contact?: number;
 
-  @IsOptional()
+  @IsNotEmpty()
   @IsNumber()
   @Max(24)
   @Min(0)
   startWork?: number;
 
-  @IsOptional()
+  @IsNotEmpty()
   @IsNumber()
   @Max(24)
   @Min(0)

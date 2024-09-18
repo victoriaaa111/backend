@@ -11,6 +11,7 @@ import { Worker } from '../auth/schemas/worker.schema';
 import { UpdateWorkerDto } from './dto/update-worker.dto';
 import { Order } from '../user/entities/order.schema';
 import { OrderStatusDto } from './dto/order.status.dto';
+import { ServiceDto } from './dto/service.dto';
 
 @Injectable()
 export class WorkerService {
@@ -22,15 +23,7 @@ export class WorkerService {
     @InjectModel(Order.name) private OrderModel: Model<Order>,
   ) {}
 
-  async addService(
-    workerId: mongoose.Types.ObjectId,
-    serviceData: {
-      id?: string;
-      service: string;
-      description: string;
-      price: number;
-    },
-  ) {
+  async addService(workerId: mongoose.Types.ObjectId, serviceData: ServiceDto) {
     try {
       const worker = await this.WorkerModel.findOne({ _id: workerId });
       if (!worker) {
