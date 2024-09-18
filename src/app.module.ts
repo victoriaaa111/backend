@@ -17,6 +17,7 @@ import { Worker, WorkerSchema } from "./auth/schemas/worker.schema";
 import { WorkerServices, WorkerServicesSchema } from "./worker/entities/worker-services.schema";
 import { Order, OrderSchema } from "./user/entities/order.schema";
 import { Review, ReviewSchema } from "./user/entities/review.schema";
+import { ShareableModule } from './shareable/shareable.module';
 
 @Module({
   imports: [
@@ -38,6 +39,7 @@ import { Review, ReviewSchema } from "./user/entities/review.schema";
       { name: Order.name, schema: OrderSchema },
       { name: Review.name, schema: ReviewSchema },
     ]),
+    ShareableModule,
   ],
   controllers: [AppController],
   providers: [AppService, TaskService],
