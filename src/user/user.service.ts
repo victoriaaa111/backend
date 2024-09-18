@@ -206,4 +206,16 @@ export class UserService {
       date: date,
     });
   }
+
+  async findWorker(workerId: string) {
+    const worker = await this.WorkerModel.findOne({ _id: workerId });
+    if (!worker) {
+      throw new NotFoundException('Worker not found');
+    }
+    // return this.WorkerModel.findById(workerId);
+    return this.WorkerModel.findById(workerId).populate({
+      path: 'services',
+      select: 'id service description price',
+    });
+  }
 }
