@@ -14,6 +14,7 @@ import mongoose, { ObjectId } from 'mongoose';
 import { UpdateWorkerDto } from './dto/update-worker.dto';
 import { OrderStatusDto } from './dto/order.status.dto';
 import { ServiceDto } from './dto/service.dto';
+import { SearchWorkerDto } from './dto/search-worker.dto';
 
 @Controller('worker')
 export class WorkerController {
@@ -74,5 +75,21 @@ export class WorkerController {
     @Body() orderStatus: OrderStatusDto,
   ) {
     return this.workerService.executedStatusChange(id, orderStatus);
+  }
+
+  @Post('search')
+  async searchWorkers(@Body() searchWorkerDto: SearchWorkerDto) {
+    try {
+      const workers = await this.workerService.searchWorkers(searchWorkerDto);
+
+      // Transform the array of workers to an array of WorkerDto
+      return workers.map(worker =>
+          plainToClass(WorkerDto, worker, {
+            excludeExtraneousValues: true,
+          }),
+      );
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
   }
 }
