@@ -13,6 +13,7 @@ import { plainToClass } from 'class-transformer';
 import mongoose, { ObjectId } from 'mongoose';
 import { UpdateWorkerDto } from './dto/update-worker.dto';
 import { OrderStatusDto } from './dto/order.status.dto';
+import { ServiceDto } from './dto/service.dto';
 
 @Controller('worker')
 export class WorkerController {
@@ -22,12 +23,7 @@ export class WorkerController {
   async addService(
     @Param('workerId') workerId: string,
     @Body()
-    serviceData: {
-      id: string;
-      service: string;
-      description: string;
-      price: number;
-    },
+    serviceData: ServiceDto,
   ) {
     try {
       const userObjectId = new mongoose.Types.ObjectId(workerId);
