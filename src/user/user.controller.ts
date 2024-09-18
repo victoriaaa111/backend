@@ -14,6 +14,8 @@ import { ObjectId } from 'mongoose';
 import { TimeDto } from './dto/time.dto';
 import { IdDto } from './dto/userId.dto';
 import { ReviewDto } from './dto/review.dto';
+import { plainToClass } from "class-transformer";
+import { WorkerDto } from "../worker/dto/exclusion.dto";
 
 @Controller('user')
 export class UserController {
@@ -50,5 +52,16 @@ export class UserController {
   @Post('add-review')
   async addReview(@Body() reviewInfo: ReviewDto) {
     return this.userService.addReview(reviewInfo);
+  }
+
+  @Get('/worker/:id')
+  async findWorker(@Param('id') id: string) {
+    const worker = await this.userService.findWorker(id);
+
+    // Transform the worker object to WorkerDto
+    // return worker;
+    return plainToClass(WorkerDto, worker, {
+      excludeExtraneousValues: true,
+    });
   }
 }

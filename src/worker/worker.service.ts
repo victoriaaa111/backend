@@ -32,6 +32,15 @@ export class WorkerService {
         throw new NotFoundException('Worker not found');
       }
 
+      const serviceExist = await this.WorkerServicesModel.findOne({
+        workerId: workerId,
+        service: serviceData.service,
+      });
+
+      if (serviceExist) {
+        throw new NotFoundException('Service already exists');
+      }
+
       if (serviceData.id === null) {
         const newService = new this.WorkerServicesModel({
           workerId: worker._id,
