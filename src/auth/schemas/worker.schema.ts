@@ -34,6 +34,12 @@ export class Worker extends Document {
 
   @Prop()
   isActive: boolean;
+
+  @Prop({ required: true })
+  name: string;
+
+  // @Prop({ required: true })
+  // location: string;
 }
 
 export const WorkerSchema = SchemaFactory.createForClass(Worker);
