@@ -131,7 +131,10 @@ export class WorkerService {
   }
 
   async findOrders(id: ObjectId) {
-    return this.OrderModel.find({ workerId: id });
+    return this.OrderModel.find({
+      workerId: id,
+      status: { $nin: ['Declined', 'Canceled'] },
+    });
   }
 
   async executedStatusChange(id: ObjectId, orderStatus: OrderStatusDto) {
