@@ -1,9 +1,11 @@
-import { Body, Controller, Get, Param, Put } from '@nestjs/common';
+import { Body, Controller, Get, Param, Put, UseGuards } from "@nestjs/common";
 import { AdminService } from './admin.service';
 import { UpdateWorkerDto } from './dtos/update-worker.dto';
 import { UpdateUserDto } from './dtos/update-user.dto';
 import { UpdateRatingDto } from './dtos/worker-rating.dto';
+import { AuthGuard } from '../guards/auth.guard';
 
+@UseGuards(AuthGuard)
 @Controller('admin')
 export class AdminController {
   constructor(private adminService: AdminService) {}
