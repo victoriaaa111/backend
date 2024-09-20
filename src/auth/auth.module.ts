@@ -10,15 +10,7 @@ import {
 import { ResetToken, ResetTokenSchema } from './schemas/reset-token.schema';
 import { MailService } from 'src/services/mail.service';
 import { Worker, WorkerSchema } from './schemas/worker.schema';
-import {
-  RefreshTokenWorker,
-  RefreshTokenWorkerSchema,
-} from './schemas/refresh-token.admin.schema';
 import { Admin, AdminSchema } from './schemas/admin.schema';
-import {
-  AdminRefreshToken,
-  AdminRefreshTokenSchema,
-} from './schemas/admin.refresh-token.dto';
 import {
   ResetWorkerToken,
   ResetWorkerTokenSchema,
@@ -31,10 +23,8 @@ import {
       { name: RefreshToken.name, schema: RefreshTokenSchema },
       { name: ResetToken.name, schema: ResetTokenSchema },
       { name: Worker.name, schema: WorkerSchema },
-      { name: RefreshTokenWorker.name, schema: RefreshTokenWorkerSchema },
       { name: ResetWorkerToken.name, schema: ResetWorkerTokenSchema },
       { name: Admin.name, schema: AdminSchema },
-      { name: AdminRefreshToken.name, schema: AdminRefreshTokenSchema },
     ]),
   ],
   providers: [AuthService, MailService],

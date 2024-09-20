@@ -21,9 +21,7 @@ import { MailService } from 'src/services/mail.service';
 import { SignupWorkerDto } from './dtos/signup.worker.dto';
 import { Worker } from './schemas/worker.schema';
 import { LoginWorkerDto } from './dtos/login.worker.dto';
-import { RefreshTokenWorker } from './schemas/refresh-token.admin.schema';
 import { Admin } from './schemas/admin.schema';
-import { AdminRefreshToken } from './schemas/admin.refresh-token.dto';
 
 @Injectable()
 export class AuthService {
@@ -36,15 +34,13 @@ export class AuthService {
     @InjectModel(ResetWorkerToken.name)
     private ResetWorkerTokenModel: Model<ResetWorkerToken>,
     @InjectModel(Worker.name) private WorkerModel: Model<Worker>,
-    @InjectModel(RefreshTokenWorker.name)
-    private RefreshTokenWorkerModel: Model<RefreshTokenWorker>,
     @InjectModel(Admin.name)
     private adminModel: Model<Admin>,
-    @InjectModel(AdminRefreshToken.name)
-    private RefreshTokenAdminModel: Model<AdminRefreshToken>,
     private jwtService: JwtService,
     private mailService: MailService,
   ) {}
+
+  //user
 
   async signup(signupData: SignupDto) {
     const { email, password, fullName } = signupData;
@@ -85,11 +81,45 @@ export class AuthService {
       throw new BadRequestException('Wrong credentials');
     }
     //generate jwt tokens
-    const tokens = await this.generateUserToken(user._id);
+    const tokens = await this.generateToken(user._id);
     return {
       ...tokens,
       userId: user._id,
     };
+  }
+
+  async refreshToken(refreshToken: string) {
+    const token = await this.RefreshTokenModel.findOne({
+      token: refreshToken,
+      expiryDate: { $gte: new Date() },
+    });
+
+    if (!token) {
+      throw new UnauthorizedException('Wrong token');
+    }
+
+    return this.generateToken(token.id);
+  }
+
+  async generateToken(id) {
+    const accessToken = this.jwtService.sign({ id }, { expiresIn: '1h' });
+    const refreshToken = uuidv4();
+
+    await this.storeRefreshToken(refreshToken, id);
+    return { accessToken, refreshToken };
+  }
+
+  async storeRefreshToken(token: string, id) {
+    // calculate expiry date 3 days from now
+    const expiryDate = new Date();
+    expiryDate.setDate(expiryDate.getDate() + 3);
+    await this.RefreshTokenModel.updateOne(
+      { id },
+      { $set: { expiryDate, token } },
+      {
+        upsert: true,
+      },
+    );
   }
 
   async changePassword(userId, oldPassword: string, newPassword: string) {
@@ -149,6 +179,8 @@ export class AuthService {
     user.password = await bcrypt.hash(newPassword, 10);
     await user.save();
   }
+
+  //todo worker
 
   async changePasswordWorker(
     workerId,
@@ -228,40 +260,6 @@ export class AuthService {
     await admin.save();
   }
 
-  async refreshToken(refreshToken: string) {
-    const token = await this.RefreshTokenModel.findOne({
-      token: refreshToken,
-      expiryDate: { $gte: new Date() },
-    });
-
-    if (!token) {
-      throw new UnauthorizedException('Wrong token');
-    }
-
-    return this.generateUserToken(token.userId);
-  }
-
-  async generateUserToken(userId) {
-    const accessToken = this.jwtService.sign({ userId }, { expiresIn: '1h' });
-    const refreshToken = uuidv4();
-
-    await this.storeRefreshToken(refreshToken, userId);
-    return { accessToken, refreshToken };
-  }
-
-  async storeRefreshToken(token: string, userId) {
-    // calculate expiry date 3 days from now
-    const expiryDate = new Date();
-    expiryDate.setDate(expiryDate.getDate() + 3);
-    await this.RefreshTokenModel.updateOne(
-      { userId },
-      { $set: { expiryDate, token } },
-      {
-        upsert: true,
-      },
-    );
-  }
-
   //worker authentication
 
   async signupWorker(signupData: SignupWorkerDto) {
@@ -304,32 +302,11 @@ export class AuthService {
       throw new BadRequestException('Wrong credentials');
     }
     //generate jwt tokens
-    const tokens = await this.generateWorkerToken(worker._id);
+    const tokens = await this.generateToken(worker._id);
     return {
       ...tokens,
       workerId: worker._id,
     };
-  }
-
-  async generateWorkerToken(workerId) {
-    const accessToken = this.jwtService.sign({ workerId }, { expiresIn: '1h' });
-    const refreshToken = uuidv4();
-
-    await this.storeRefreshToken(refreshToken, workerId);
-    return { accessToken, refreshToken };
-  }
-
-  async refreshTokenWorker(refreshToken: string) {
-    const token = await this.RefreshTokenWorkerModel.findOne({
-      token: refreshToken,
-      expiryDate: { $gte: new Date() },
-    });
-
-    if (!token) {
-      throw new UnauthorizedException('Wrong token');
-    }
-
-    return this.generateUserToken(token.workerId);
   }
 
   async loginAdmin(credentials: LoginDto) {
@@ -344,44 +321,10 @@ export class AuthService {
       throw new BadRequestException('Invalid email or password');
     }
 
-    const tokens = await this.generateAdminToken(admin._id);
+    const tokens = await this.generateToken(admin._id);
     return {
       ...tokens,
       adminId: admin._id,
     };
-  }
-
-  async refreshAdminToken(refreshToken: string) {
-    const token = await this.RefreshTokenAdminModel.findOne({
-      token: refreshToken,
-      expiryDate: { $gte: new Date() },
-    });
-
-    if (!token) {
-      throw new UnauthorizedException('Wrong token');
-    }
-
-    return this.generateAdminToken(token.adminId);
-  }
-
-  async generateAdminToken(adminId) {
-    const accessToken = this.jwtService.sign({ adminId }, { expiresIn: '1h' });
-    const refreshToken = uuidv4();
-
-    await this.storeRefreshAdminToken(refreshToken, adminId);
-    return { accessToken, refreshToken };
-  }
-
-  async storeRefreshAdminToken(token: string, adminId) {
-    // calculate expiry date 3 days from now
-    const expiryDate = new Date();
-    expiryDate.setDate(expiryDate.getDate() + 3);
-    await this.RefreshTokenAdminModel.updateOne(
-      { adminId },
-      { $set: { expiryDate, token } },
-      {
-        upsert: true,
-      },
-    );
   }
 }

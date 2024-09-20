@@ -1,5 +1,4 @@
 import {
-  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -7,6 +6,7 @@ import {
   Param,
   Post,
   Put,
+  UseGuards,
 } from '@nestjs/common';
 import { WorkerService } from './worker.service';
 import { WorkerDto } from './dto/exclusion.dto';
@@ -15,7 +15,9 @@ import mongoose, { ObjectId } from 'mongoose';
 import { UpdateWorkerDto } from './dto/update-worker.dto';
 import { OrderStatusDto } from './dto/order.status.dto';
 import { ServiceDto } from './dto/service.dto';
+import { AuthGuard } from '../guards/auth.guard';
 
+@UseGuards(AuthGuard)
 @Controller('worker')
 export class WorkerController {
   constructor(private readonly workerService: WorkerService) {}

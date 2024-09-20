@@ -3,12 +3,15 @@ import {
   Get,
   Body,
   BadRequestException,
+  UseGuards,
 } from '@nestjs/common';
 import { ShareableService } from './shareable.service';
 import { SearchWorkerDto } from './dto/search-worker.dto';
 import { plainToClass } from 'class-transformer';
 import { WorkerDto } from '../worker/dto/exclusion.dto';
+import { AuthGuard } from '../guards/auth.guard';
 
+@UseGuards(AuthGuard)
 @Controller('shareable')
 export class ShareableController {
   constructor(private readonly shareableService: ShareableService) {}

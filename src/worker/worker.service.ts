@@ -32,14 +32,15 @@ export class WorkerService {
         throw new NotFoundException('Worker not found');
       }
 
-      const serviceExist = await this.WorkerServicesModel.findOne({
-        workerId: workerId,
-        service: serviceData.service,
-      });
-
-      if (serviceExist) {
-        throw new NotFoundException('Service already exists');
-      }
+      //todo: nu lucreaza cum trebuie, daca gaseste mai mult de 1 serviciu care se repeta atunci sa zica ca service already exist
+      // const serviceExist = await this.WorkerServicesModel.findO({
+      //   workerId: workerId,
+      //   service: serviceData.service,
+      // });
+      //
+      // if (serviceExist) {
+      //   throw new NotFoundException('Service already exists');
+      // }
 
       if (serviceData.id === null) {
         const newService = new this.WorkerServicesModel({
