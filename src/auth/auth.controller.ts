@@ -13,7 +13,6 @@ import { ResetPasswordDto } from './dtos/reset-password.dto';
 import { ResetPasswordWorkerDto } from './dtos/reset-password.worker.dto';
 import { SignupWorkerDto } from './dtos/signup.worker.dto';
 import { LoginWorkerDto } from './dtos/login.worker.dto';
-import { AdminRefreshTokenDto } from './dtos/admin.refresh-token.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -92,12 +91,6 @@ export class AuthController {
     return this.authService.loginWorker(credentials);
   }
 
-  //Refresh Token for worker
-  @Post('worker/refresh')
-  async refreshTokensWorker(@Body() refreshTokenDto: RefreshTokenDto) {
-    return this.authService.refreshTokenWorker(refreshTokenDto.refreshToken);
-  }
-
   //Change Password WORKER
   @UseGuards(AuthGuard)
   @Put('worker/change-password')
@@ -135,11 +128,5 @@ export class AuthController {
   @Post('admin/login')
   async loginAdmin(@Body() credentials: LoginDto) {
     return this.authService.loginAdmin(credentials);
-  }
-  //TODO: POST Refresh Token
-  @Post('admin/refresh')
-  // eslint-disable-next-line prettier/prettier
-  async refreshTokensAdmin(@Body() refreshTokenDto: AdminRefreshTokenDto) {
-    return this.authService.refreshAdminToken(refreshTokenDto.refreshToken);
   }
 }

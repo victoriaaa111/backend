@@ -8,7 +8,6 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Admin } from '../auth/schemas/admin.schema';
 import { JwtService } from '@nestjs/jwt';
-import { AdminRefreshToken } from '../auth/schemas/admin.refresh-token.dto';
 import { User } from '../auth/schemas/user.schema';
 import { Worker } from '../auth/schemas/worker.schema';
 import { UpdateWorkerDto } from './dtos/update-worker.dto';
@@ -20,8 +19,6 @@ export class AdminService {
   constructor(
     @InjectModel(Admin.name)
     private adminModel: Model<Admin>,
-    @InjectModel(AdminRefreshToken.name)
-    private RefreshTokenModel: Model<AdminRefreshToken>,
     @InjectModel(User.name) private UserModel: Model<User>,
     @InjectModel(Worker.name) private WorkerModel: Model<Worker>,
     private jwtService: JwtService,

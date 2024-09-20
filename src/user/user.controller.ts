@@ -3,10 +3,9 @@ import {
   Get,
   Post,
   Body,
-  Patch,
   Param,
-  Delete,
   Put,
+  UseGuards,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { OrderDto } from './dto/order.dto';
@@ -14,9 +13,11 @@ import { ObjectId } from 'mongoose';
 import { TimeDto } from './dto/time.dto';
 import { IdDto } from './dto/userId.dto';
 import { ReviewDto } from './dto/review.dto';
-import { plainToClass } from "class-transformer";
-import { WorkerDto } from "../worker/dto/exclusion.dto";
+import { plainToClass } from 'class-transformer';
+import { WorkerDto } from '../worker/dto/exclusion.dto';
+import { AuthGuard } from '../guards/auth.guard';
 
+@UseGuards(AuthGuard)
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
