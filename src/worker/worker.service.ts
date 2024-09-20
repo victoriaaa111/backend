@@ -135,7 +135,7 @@ export class WorkerService {
     return this.OrderModel.find({
       workerId: id,
       status: { $nin: ['Declined', 'Canceled'] },
-    });
+    }).populate('userId', 'fullName');
   }
 
   async executedStatusChange(id: ObjectId, orderStatus: OrderStatusDto) {
