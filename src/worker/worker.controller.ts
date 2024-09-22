@@ -78,4 +78,9 @@ export class WorkerController {
   ) {
     return this.workerService.executedStatusChange(id, orderStatus);
   }
+
+  @Get('/reviews/:id')
+  async getReviews(@Param('id') id: ObjectId) {
+    return this.workerService.getReviews(id);
+  }
 }

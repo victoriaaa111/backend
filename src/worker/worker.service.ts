@@ -14,6 +14,7 @@ import { OrderStatusDto } from './dto/order.status.dto';
 import { ServiceDto } from './dto/service.dto';
 import { SearchWorkerDto } from '../shareable/dto/search-worker.dto';
 import * as path from 'node:path';
+import { Review } from "../user/entities/review.schema";
 
 @Injectable()
 export class WorkerService {
@@ -23,6 +24,7 @@ export class WorkerService {
     @InjectModel(WorkerServices.name)
     private WorkerServicesModel: Model<WorkerServices>,
     @InjectModel(Order.name) private OrderModel: Model<Order>,
+    @InjectModel(Review.name) private ReviewModel: Model<Review>,
   ) {}
 
   async addService(workerId: mongoose.Types.ObjectId, serviceData: ServiceDto) {
@@ -183,5 +185,16 @@ export class WorkerService {
         'Status can not be changed the order was Done',
       );
     }
+  }
+
+  async getReviews(id: ObjectId) {
+    const reviews = this.ReviewModel.find({ workerId: id });
+    if (!reviews) {
+      throw new NotFoundException('Reviews not found');
+    }
+
+    return reviews
+      .populate({ path: 'userId', select: 'fullName' })
+      .populate({ path: 'orderId', select: 'service' });
   }
 }
