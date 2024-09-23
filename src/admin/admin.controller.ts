@@ -1,9 +1,18 @@
-import { Body, Controller, Get, Param, Put, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Put,
+  UseGuards,
+} from '@nestjs/common';
 import { AdminService } from './admin.service';
 import { UpdateWorkerDto } from './dtos/update-worker.dto';
 import { UpdateUserDto } from './dtos/update-user.dto';
 import { UpdateRatingDto } from './dtos/worker-rating.dto';
 import { AuthGuard } from '../guards/auth.guard';
+import { ObjectId } from 'mongoose';
 
 @UseGuards(AuthGuard)
 @Controller('admin')
@@ -56,5 +65,28 @@ export class AdminController {
     @Body() updateRating: UpdateRatingDto,
   ) {
     return this.adminService.updateRating(id, updateRating);
+  }
+
+  @Get('/reviews/:id')
+  async getReviews(@Param('id') id: ObjectId) {
+    return this.adminService.getReviews(id);
+  }
+
+  @Get('/workers-with-no-rating')
+  async getWorkersWith0Rating() {
+    return this.adminService.getWorkersWith0Rating();
+  }
+
+  @Put('/edit/review/:id')
+  async editReview(
+    @Param('id') id: ObjectId,
+    @Body() updatedRating: UpdateRatingDto,
+  ) {
+    return this.adminService.editReview(id, updatedRating);
+  }
+
+  @Delete('/delete/review/:id')
+  async deleteReview(@Param('id') id: ObjectId) {
+    return this.adminService.deleteReview(id);
   }
 }

@@ -5,6 +5,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { AdminSchema } from '../auth/schemas/admin.schema';
 import { User, UserSchema } from '../auth/schemas/user.schema';
 import { Worker, WorkerSchema } from '../auth/schemas/worker.schema';
+import { Review, ReviewSchema } from '../user/entities/review.schema';
 
 @Module({
   imports: [
@@ -12,6 +13,7 @@ import { Worker, WorkerSchema } from '../auth/schemas/worker.schema';
       { name: 'Admin', schema: AdminSchema },
       { name: User.name, schema: UserSchema },
       { name: Worker.name, schema: WorkerSchema },
+      { name: Review.name, schema: ReviewSchema },
     ]),
   ],
   controllers: [AdminController],
