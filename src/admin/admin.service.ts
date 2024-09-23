@@ -5,7 +5,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, ObjectId } from "mongoose";
 import { Admin } from '../auth/schemas/admin.schema';
 import { JwtService } from '@nestjs/jwt';
 import { User } from '../auth/schemas/user.schema';
@@ -13,6 +13,7 @@ import { Worker } from '../auth/schemas/worker.schema';
 import { UpdateWorkerDto } from './dtos/update-worker.dto';
 import { UpdateUserDto } from './dtos/update-user.dto';
 import { UpdateRatingDto } from './dtos/worker-rating.dto';
+import { Review } from '../user/entities/review.schema';
 
 @Injectable()
 export class AdminService {
@@ -21,6 +22,7 @@ export class AdminService {
     private adminModel: Model<Admin>,
     @InjectModel(User.name) private UserModel: Model<User>,
     @InjectModel(Worker.name) private WorkerModel: Model<Worker>,
+    @InjectModel(Review.name) private ReviewModel: Model<Review>,
     private jwtService: JwtService,
   ) {}
 
@@ -120,5 +122,73 @@ export class AdminService {
     });
     console.log(rating);
     return { message: 'Rating updated' };
+  }
+
+  async getReviews(id: ObjectId) {
+    const reviews = this.ReviewModel.find({ workerId: id });
+    if (!reviews) {
+      throw new NotFoundException('Reviews not found');
+    }
+
+    return reviews
+      .populate({ path: 'userId', select: 'fullName' })
+      .populate({ path: 'orderId', select: 'service' });
+  }
+
+  async getWorkersWith0Rating() {
+    return this.WorkerModel.find({ rating: 0 });
+  }
+
+  async editReview(id: ObjectId, updatedRating: UpdateRatingDto) {
+    const review = await this.ReviewModel.findByIdAndUpdate(id, updatedRating);
+    if (!review) {
+      throw new NotFoundException('Review not found');
+    }
+    const worker = await this.ReviewModel.aggregate([
+      {
+        $match: {
+          workerId: id,
+        },
+      },
+      {
+        $group: {
+          _id: '$workerId',
+          averageRating: { $avg: '$rating' },
+          reviewCount: { $sum: 1 },
+        },
+      },
+      {
+        $match: {
+          reviewCount: { $gt: 3 },
+        },
+      },
+    ]);
+
+    // Check if the worker exists and has more than 3 reviews
+    if (worker.length > 0) {
+      const workerData = worker[0];
+      const bulkOps = [
+        {
+          updateOne: {
+            filter: { _id: workerData._id },
+            update: { rating: parseFloat(workerData.averageRating.toFixed(1)) },
+          },
+        },
+      ];
+
+      if (bulkOps.length > 0) {
+        await this.WorkerModel.bulkWrite(bulkOps);
+      }
+    }
+    return { message: 'Review edited' };
+  }
+
+  async deleteReview(id: ObjectId) {
+    const review = await this.ReviewModel.findById(id);
+    if (!review) {
+      throw new NotFoundException('Review not found');
+    }
+    await this.ReviewModel.findByIdAndDelete(id);
+    return { message: 'Review deleted' };
   }
 }
