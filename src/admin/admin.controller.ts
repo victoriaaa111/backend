@@ -13,6 +13,8 @@ import { UpdateUserDto } from './dtos/update-user.dto';
 import { UpdateRatingDto } from './dtos/worker-rating.dto';
 import { AuthGuard } from '../guards/auth.guard';
 import { ObjectId } from 'mongoose';
+import { OrderStatusDto } from "../worker/dto/order.status.dto";
+import { UpdatedHoursDto } from "./dtos/updated-hours.dto";
 
 @UseGuards(AuthGuard)
 @Controller('admin')
@@ -88,5 +90,26 @@ export class AdminController {
   @Delete('/delete/review/:id')
   async deleteReview(@Param('id') id: ObjectId) {
     return this.adminService.deleteReview(id);
+  }
+
+  @Get('/orders')
+  async getOrders() {
+    return this.adminService.getOrders();
+  }
+
+  @Put('/order/change-status/:id')
+  async changeStatusOrder(
+    @Param('id') id: string,
+    @Body() updatedStatus: OrderStatusDto,
+  ) {
+    return this.adminService.changeStatusOrder(id, updatedStatus);
+  }
+
+  @Put('/order/reschedule/:id')
+  async rescheduleOrder(
+    @Param('id') id: ObjectId,
+    @Body() updatedHours: UpdatedHoursDto,
+  ) {
+    return this.adminService.rescheduleOrder(id, updatedHours);
   }
 }

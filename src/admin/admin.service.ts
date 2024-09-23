@@ -5,7 +5,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model, ObjectId } from "mongoose";
+import { Model, ObjectId, Types } from "mongoose";
 import { Admin } from '../auth/schemas/admin.schema';
 import { JwtService } from '@nestjs/jwt';
 import { User } from '../auth/schemas/user.schema';
@@ -14,6 +14,11 @@ import { UpdateWorkerDto } from './dtos/update-worker.dto';
 import { UpdateUserDto } from './dtos/update-user.dto';
 import { UpdateRatingDto } from './dtos/worker-rating.dto';
 import { Review } from '../user/entities/review.schema';
+import { Order } from "../user/entities/order.schema";
+import * as path from "node:path";
+import { OrderStatusDto } from "../worker/dto/order.status.dto";
+import { OrderDto } from "../user/dto/order.dto";
+import { UpdatedHoursDto } from "./dtos/updated-hours.dto";
 
 @Injectable()
 export class AdminService {
@@ -23,6 +28,7 @@ export class AdminService {
     @InjectModel(User.name) private UserModel: Model<User>,
     @InjectModel(Worker.name) private WorkerModel: Model<Worker>,
     @InjectModel(Review.name) private ReviewModel: Model<Review>,
+    @InjectModel(Order.name) private OrderModel: Model<Order>,
     private jwtService: JwtService,
   ) {}
 
@@ -190,5 +196,87 @@ export class AdminService {
     }
     await this.ReviewModel.findByIdAndDelete(id);
     return { message: 'Review deleted' };
+  }
+
+  async getOrders() {
+    return this.OrderModel.find()
+      .populate('userId', 'fullName')
+      .populate('workerId', 'fullName');
+  }
+
+  async changeStatusOrder(id: string, orderStatus: OrderStatusDto) {
+    const order = await this.OrderModel.findById(id);
+    if (!order) {
+      throw new NotFoundException('Order not found');
+    }
+    await this.OrderModel.findByIdAndUpdate(id, orderStatus);
+    return { message: 'Order updated' };
+  }
+
+  async rescheduleOrder(id: ObjectId, updatedHours: UpdatedHoursDto) {
+    const order = await this.OrderModel.findById(id);
+    if (!order) {
+      throw new NotFoundException('Order not found');
+    }
+
+    const isWorkerAvailable = await this.checkWorkerAvailability(
+      order.workerId,
+      updatedHours.startDate,
+      updatedHours.endDate,
+    );
+    if (!isWorkerAvailable) {
+      throw new BadRequestException(
+        'The worker is not available during the requested time slot.',
+      );
+    }
+    // Retrieve worker's working hours
+    const worker = await this.WorkerModel.findById(order.workerId);
+
+    // Check if the order's execution time is within worker's working hours
+    const startHour = updatedHours.startDate.getHours();
+    const endHour = updatedHours.endDate.getHours();
+    if (startHour < worker.startWork || endHour > worker.endWork) {
+      throw new BadRequestException(
+        "The order time is outside the worker's working hours.",
+      );
+    }
+
+    // Calculate the duration in hours
+    const durationInHours =
+      (new Date(updatedHours.endDate).getTime() -
+        new Date(updatedHours.startDate).getTime()) /
+      (1000 * 60 * 60);
+
+    const durationInHoursPrevious =
+      (new Date(order.endDate).getTime() -
+        new Date(order.startDate).getTime()) /
+      (1000 * 60 * 60);
+
+    // Calculate the total price
+    const totalPrice =
+      durationInHours * (order.price / durationInHoursPrevious);
+
+    await this.OrderModel.findByIdAndUpdate(id, {
+      startDate: updatedHours.startDate,
+      endDate: updatedHours.endDate,
+      price: totalPrice,
+    });
+
+    return { message: 'The order has been reschedule' };
+  }
+
+  private async checkWorkerAvailability(
+    workerId: Types.ObjectId,
+    startDate: Date,
+    endDate: Date,
+  ): Promise<boolean> {
+    // Find overlapping orders for the same worker
+    const overlappingOrders = await this.OrderModel.find({
+      workerId,
+      status: { $nin: ['Declined', 'Canceled'] },
+      $or: [{ startDate: { $lt: endDate }, endDate: { $gt: startDate } }],
+    });
+
+    return overlappingOrders.length === 0;
   }
 }

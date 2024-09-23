@@ -6,6 +6,7 @@ import { AdminSchema } from '../auth/schemas/admin.schema';
 import { User, UserSchema } from '../auth/schemas/user.schema';
 import { Worker, WorkerSchema } from '../auth/schemas/worker.schema';
 import { Review, ReviewSchema } from '../user/entities/review.schema';
+import { Order, OrderSchema } from '../user/entities/order.schema';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { Review, ReviewSchema } from '../user/entities/review.schema';
       { name: User.name, schema: UserSchema },
       { name: Worker.name, schema: WorkerSchema },
       { name: Review.name, schema: ReviewSchema },
+      { name: Order.name, schema: OrderSchema },
     ]),
   ],
   controllers: [AdminController],
