@@ -65,4 +65,10 @@ export class UserController {
       excludeExtraneousValues: true,
     });
   }
+
+  @Post('/add-favorites/:userId')
+  async addFavorite(@Param('userId') id: string,
+                    @Body('workerId') workerId: string) {
+    return this.userService.addFavorite(id, workerId);
+  }
 }

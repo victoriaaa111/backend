@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { User } from '../auth/schemas/user.schema';
-import { Model, Types, ObjectId } from 'mongoose';
+import mongoose, { Model, Types, ObjectId } from 'mongoose';
 import { OrderDto } from './dto/order.dto';
 import { Worker } from '../auth/schemas/worker.schema';
 import { WorkerServices } from '../worker/entities/worker-services.schema';
@@ -32,7 +32,15 @@ export class UserService {
       throw new NotFoundException('User not found');
     }
 
-    return this.UserModel.findOne({ _id: id });
+    return this.UserModel.findOne({ _id: id })
+        .populate({
+          path: 'favorites',
+          select: 'id fullName email contact services',
+          populate: {
+            path: 'services',
+            select: 'id service description price', // Specify the fields you want from the services collection
+          },
+        });
   }
 
   async createOrder(orderInfo: OrderDto) {
@@ -218,4 +226,32 @@ export class UserService {
       select: 'id service description price',
     });
   }
+
+  async addFavorite(userId: string, workerId: string) {
+    const workerObjectId = new mongoose.Types.ObjectId(workerId);
+    const user = await this.UserModel.findById(userId);
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    const worker = await this.WorkerModel.findById(workerId);
+    if (!worker) {
+      throw new NotFoundException('Worker not found');
+    }
+
+    // Check if the worker is already in the user's favorites
+    if (user.favorites.includes(workerObjectId)) {
+      throw new BadRequestException('Worker is already in favorites');
+    }
+
+    await this.UserModel.findByIdAndUpdate(
+        userId,
+        { $push: { favorites: workerId } },
+        { new: true, useFindAndModify: false },
+    );
+
+    return { message: 'Worker added to favorites successfully' };
+  }
+
+
 }
