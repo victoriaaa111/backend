@@ -3,6 +3,18 @@
 All notable changes to this backend project will be documented in this file.
 
 ## [Unreleased]
+## Week of 11.11.2024
+### Added
+- User functionality: Add favorite workers (SCRUM 45)
+- Changed user.schema.
+- Changed findUser such that it displays now favorite workers for each user.
+- Created API `/add-favorite/:id`.
+
+### Merged
+- Merge pull request #36 from victoriaaa111 (SCRUM 45).
+
+---
+
 ## Study Process (October 2024 - November 2024)
 ### Research and Skill Development
 - **SSL Certificates**: Studied and researched SSL certificates to enhance security protocols. (https://medium.com/@m.fareed607/how-to-set-up-an-nginx-reverse-proxy-server-and-enable-https-with-certbot-bbab9feb6338, https://www.digitalocean.com/community/tutorials/how-to-create-a-self-signed-ssl-certificate-for-nginx-on-centos-7#step-1-create-the-ssl-certificate)
