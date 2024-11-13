@@ -3,6 +3,18 @@
 All notable changes to this backend project will be documented in this file.
 
 ## [Unreleased]
+## Week of 11.11.2024
+### Added
+- User functionality: Add favorite workers and remove from favorites(SCRUM 45)
+  - Changed `user.schema`, `user.service` and `user.controller`
+- Changed findUser such that it displays now favorite workers for each user.
+- Created API `/add-favorite/:id`.
+
+### Merged
+- Merge pull request #37 from victoriaaa111 (SCRUM 45).
+- Merge pull request #36 from victoriaaa111 (SCRUM 45).
+
+---
 ## Study Process (October 2024 - November 2024)
 ### Research and Skill Development
 - **SSL Certificates**: Studied and researched SSL certificates to enhance security protocols. (https://medium.com/@m.fareed607/how-to-set-up-an-nginx-reverse-proxy-server-and-enable-https-with-certbot-bbab9feb6338, https://www.digitalocean.com/community/tutorials/how-to-create-a-self-signed-ssl-certificate-for-nginx-on-centos-7#step-1-create-the-ssl-certificate)
@@ -10,7 +22,7 @@ All notable changes to this backend project will be documented in this file.
 - **Advanced Git Course**: Completed an advanced course on Gitflow Workflow (https://www.atlassian.com/git/tutorials/comparing-workflows/gitflow-workflow).
 - **Midterm Report**: Enhanced the quality and structure of the midterm report.
 - **Market Research**: Conducted further market research to better understand target audiences and requirements.
-
+---
 ## Week of 23.09.2024
 ### Added
 - Admin functionality: retrieve orders, change status, and reschedule orders (SCRUM 47).
