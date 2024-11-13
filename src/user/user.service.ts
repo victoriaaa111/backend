@@ -32,15 +32,14 @@ export class UserService {
       throw new NotFoundException('User not found');
     }
 
-    return this.UserModel.findOne({ _id: id })
-        .populate({
-          path: 'favorites',
-          select: 'id fullName email contact services',
-          populate: {
-            path: 'services',
-            select: 'id service description price', // Specify the fields you want from the services collection
-          },
-        });
+    return this.UserModel.findOne({ _id: id }).populate({
+      path: 'favorites',
+      select: 'id fullName email contact services',
+      populate: {
+        path: 'services',
+        select: 'id service description price', // Specify the fields you want from the services collection
+      },
+    });
   }
 
   async createOrder(orderInfo: OrderDto) {
@@ -245,13 +244,39 @@ export class UserService {
     }
 
     await this.UserModel.findByIdAndUpdate(
-        userId,
-        { $push: { favorites: workerId } },
-        { new: true, useFindAndModify: false },
+      userId,
+      { $push: { favorites: workerId } },
+      { new: true, useFindAndModify: false },
     );
 
     return { message: 'Worker added to favorites successfully' };
   }
 
+  async deleteFavorite(userId: string, workerId: string) {
+    const workerObjectId = new mongoose.Types.ObjectId(workerId);
 
+    const user = await this.UserModel.findById(userId);
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    const worker = await this.WorkerModel.findById(workerId);
+    if (!worker) {
+      throw new NotFoundException('Worker not found');
+    }
+
+    // Check if the worker is in the user's favorites
+    if (!user.favorites.includes(workerObjectId)) {
+      throw new BadRequestException('Worker is not in favorites');
+    }
+
+    // Remove the worker from the user's favorites
+    await this.UserModel.findByIdAndUpdate(
+      userId,
+      { $pull: { favorites: workerObjectId } },
+      { new: true, useFindAndModify: false },
+    );
+
+    return { message: 'Worker removed from favorites successfully' };
+  }
 }
