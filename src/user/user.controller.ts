@@ -5,8 +5,8 @@ import {
   Body,
   Param,
   Put,
-  UseGuards,
-} from '@nestjs/common';
+  UseGuards, Delete
+} from "@nestjs/common";
 import { UserService } from './user.service';
 import { OrderDto } from './dto/order.dto';
 import { ObjectId } from 'mongoose';
@@ -67,8 +67,18 @@ export class UserController {
   }
 
   @Post('/add-favorites/:userId')
-  async addFavorite(@Param('userId') id: string,
-                    @Body('workerId') workerId: string) {
+  async addFavorite(
+    @Param('userId') id: string,
+    @Body('workerId') workerId: string,
+  ) {
     return this.userService.addFavorite(id, workerId);
+  }
+
+  @Delete('/delete-favorites/:userId')
+  async deleteFavorite(
+    @Param('userId') id: string,
+    @Body('workerId') workerId: string,
+  ) {
+    return this.userService.deleteFavorite(id, workerId);
   }
 }
