@@ -13,8 +13,8 @@ import { UpdateUserDto } from './dtos/update-user.dto';
 import { UpdateRatingDto } from './dtos/worker-rating.dto';
 import { AuthGuard } from '../guards/auth.guard';
 import { ObjectId } from 'mongoose';
-import { OrderStatusDto } from "../worker/dto/order.status.dto";
-import { UpdatedHoursDto } from "./dtos/updated-hours.dto";
+import { OrderStatusDto } from '../worker/dto/order.status.dto';
+import { UpdatedHoursDto } from './dtos/updated-hours.dto';
 
 @UseGuards(AuthGuard)
 @Controller('admin')
@@ -79,7 +79,7 @@ export class AdminController {
     return this.adminService.getWorkersWith0Rating();
   }
 
-  @Put('/edit/review/:id')
+  @Put('/review/:id')
   async editReview(
     @Param('id') id: ObjectId,
     @Body() updatedRating: UpdateRatingDto,
@@ -87,7 +87,7 @@ export class AdminController {
     return this.adminService.editReview(id, updatedRating);
   }
 
-  @Delete('/delete/review/:id')
+  @Delete('/review/:id')
   async deleteReview(@Param('id') id: ObjectId) {
     return this.adminService.deleteReview(id);
   }
