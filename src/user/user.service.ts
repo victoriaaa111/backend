@@ -279,4 +279,11 @@ export class UserService {
 
     return { message: 'Worker removed from favorites successfully' };
   }
+
+  async getWorkers() {
+    return this.WorkerModel.find().populate({
+      path: 'services',
+      select: 'service description price',
+    });
+  }
 }
