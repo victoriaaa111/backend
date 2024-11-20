@@ -3,16 +3,102 @@
 All notable changes to this backend project will be documented in this file.
 
 ## [Unreleased]
+
+## Week of 18.11.2024
+### Added
+- User functionality: View all workers
+- Changed `user.service` and `user.controller`
+- Created New API Endpoints:
+  - Type **GET** `/user/workers`
+  - **Description:** Displays all workers to the user's list.
+  - **Body:**
+      ![img.png](img.png)
+### Fixed
+Admin API Changes:
+- **Updated Endpoints:**
+  - **PUT** `/user/review/:id`  
+    **Formerly:** `/user/edit/review/:id`  
+    **Description:** Updates a review by its ID. This change aligns with RESTful practices by using PUT for update operations and simplifying the endpoint path.
+
+  - **DELETE** `/user/review/:id`  
+    **Formerly:** `/user/delete/review/:id`  
+    **Description:** Deletes a review by its ID. This modification enhances clarity and conforms to RESTful principles by using DELETE and simplifying the resource path.
+
+User API Changes:
+- **Updated Endpoints:**
+  - **POST** `/user/favorites/:userId`  
+    **Formerly:** `/user/add-favorites/:userId`  
+    **Description:** Adds a worker to the user's list of favorites. The update to the endpoint path and method improves consistency with RESTful design.
+    
+    - Case if worker exists and is not in favorites:![img_1.png](img_1.png)
+    - Case if worker exists and is in favorites:![img_2.png](img_2.png)
+  - **DELETE** `/user/favorites/:userId`  
+    **Formerly:** `/user/delete-favorites/:userId`  
+    **Description:** Removes a worker from the user's favorites list. This change refines the endpoint to better adhere to RESTful standards by clearly indicating resource management through the DELETE method.
+    - Case if worker exists and is in favorites:![img_3.png](img_3.png)
+    - Case if worker exists and is not in favorites:![img_4.png](img_4.png)
+### Merged
+- Merge pull request [#42](https://github.com/victoriaaa111/backend/pull/42) from victoriaaa111.
+- Merge pull request [#41](https://github.com/victoriaaa111/backend/pull/41) from victoriaaa111.
+
+---
+
 ## Week of 11.11.2024
 ### Added
 - User functionality: Add favorite workers and remove from favorites(SCRUM 45)
   - Changed `user.schema`, `user.service` and `user.controller`
 - Changed findUser such that it displays now favorite workers for each user.
-- Created API `/add-favorite/:id`.
+- Created New API Endpoints:
+
+- Type **POST** `/add-favorite/:id`
+  - **Description:** Adds a favorite worker to the user's list.
+  - **Body:**
+    ```json
+    {
+      "workerId": "66f3e9c85f7b3b963d6212fb"
+    }
+    ```
+    Case if worker exists and is not in favorites.
+    ```json
+    {
+    "message": "Worker added to favorites successfully"
+    }
+    ```
+    Case if worker exists and is in favorites.
+    ```json
+    {
+    "message": "Worker is already in favorites",
+    "error": "Bad Request",
+    "statusCode": 400
+    }
+    ```
+
+- Type **DELETE** `/delete-favorites/:id`
+  - **Description:** Removes a favorite worker from the user's list.
+  - **Body:**
+    ```json
+    {
+      "workerId": "66f3e9c85f7b3b963d6212fb"
+    }
+    ```
+    Case if worker exists and is in favorites.
+    ```json
+    {
+    "message": "Worker removed from favorites successfully"
+    }
+    ```
+    Case if worker exists and is not in favorites.
+    ```json
+    {
+    "message": "Worker is not in favorites",
+    "error": "Bad Request",
+    "statusCode": 400
+    }
+    ```
 
 ### Merged
-- Merge pull request #37 from victoriaaa111 (SCRUM 45).
-- Merge pull request #36 from victoriaaa111 (SCRUM 45).
+- Merge pull request [#37](https://github.com/victoriaaa111/backend/pull/37) from victoriaaa111 (SCRUM 45).
+- Merge pull request [#36](https://github.com/victoriaaa111/backend/pull/36) from victoriaaa111 (SCRUM 45).
 
 ---
 ## Study Process (October 2024 - November 2024)
@@ -34,8 +120,8 @@ All notable changes to this backend project will be documented in this file.
 - Resolved bug with `accessToken`.
 
 ### Merged
-- Merge pull requests #34, #33, and #32 from victoriaaa111 (SCRUM 47, SCRUM 7).
-- Merge pull request #31 and #30: fixed guards bug and updated `refreshToken` API for all user types, guarded all routes with auth.
+- Merge pull requests [#34](https://github.com/victoriaaa111/backend/pull/34), [#33](https://github.com/victoriaaa111/backend/pull/33), and [#32](https://github.com/victoriaaa111/backend/pull/32) from victoriaaa111 (SCRUM 47, SCRUM 7).
+- Merge pull request [#31](https://github.com/victoriaaa111/backend/pull/31) and [#30](https://github.com/victoriaaa111/backend/pull/30): fixed guards bug and updated `refreshToken` API for all user types, guarded all routes with auth.
 
 ---
 
@@ -60,8 +146,8 @@ All notable changes to this backend project will be documented in this file.
 - Fixed `serviceId` alignment issue when retrieving a worker.
 
 ### Merged
-- Merge pull requests #29, #28, #27, #26, and #25 from victoriaaa111 (SCRUM 56, SCRUM 61, SCRUM 32).
-- Merge pull requests #24, #22, and #21: resolved rating calculation and bug fixes for serviceId, periodic rating updates.
+- Merge pull requests [#29](https://github.com/victoriaaa111/backend/pull/29), [#28](https://github.com/victoriaaa111/backend/pull/28), [#27](https://github.com/victoriaaa111/backend/pull/27), [#26](https://github.com/victoriaaa111/backend/pull/26), and [#25](https://github.com/victoriaaa111/backend/pull/25) from victoriaaa111 (SCRUM 56, SCRUM 61, SCRUM 32).
+- Merge pull requests [#24](https://github.com/victoriaaa111/backend/pull/24), [#22](https://github.com/victoriaaa111/backend/pull/22), and [#21](https://github.com/victoriaaa111/backend/pull/21): resolved rating calculation and bug fixes for serviceId, periodic rating updates.
 
 ---
 
@@ -80,8 +166,8 @@ All notable changes to this backend project will be documented in this file.
 - Modified JSON structure for `findOne` with additional signup details.
 
 ### Merged
-- Merge pull requests #13, #12, #11, #10, #9, and #8 from victoriaaa111 (SCRUM 18, SCRUM 51).
-- Merge pull requests #7 and #6: added worker signup, profile retrieval, and authentication process improvements.
+- Merge pull requests [#13](https://github.com/victoriaaa111/backend/pull/13), [#12](https://github.com/victoriaaa111/backend/pull/12), [#11](https://github.com/victoriaaa111/backend/pull/11), [#10](https://github.com/victoriaaa111/backend/pull/10), [#9](https://github.com/victoriaaa111/backend/pull/9), and [#8](https://github.com/victoriaaa111/backend/pull/8) from victoriaaa111 (SCRUM 18, SCRUM 51).
+- Merge pull requests [#7](https://github.com/victoriaaa111/backend/pull/7) and [#6](https://github.com/victoriaaa111/backend/pull/6): added worker signup, profile retrieval, and authentication process improvements.
 
 ---
 
@@ -94,7 +180,7 @@ All notable changes to this backend project will be documented in this file.
 - Added Server 
 
 ### Merged
-- Merge pull requests #5, #4, and #3 from victoriaaa111: added server, CORS, and initial authentication setup.
+- Merge pull requests [#5](https://github.com/victoriaaa111/backend/pull/5), [#4](https://github.com/victoriaaa111/backend/pull/4), and [#3](https://github.com/victoriaaa111/backend/pull/3) from victoriaaa111: added server, CORS, and initial authentication setup.
 
 ---
 
