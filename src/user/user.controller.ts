@@ -22,6 +22,11 @@ import { AuthGuard } from '../guards/auth.guard';
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
+  @Get('workers')
+  async getWorkers() {
+    return this.userService.getWorkers();
+  }
+
   @Get(':id')
   async findOne(@Param('id') id: string) {
     return this.userService.findOne(id);
