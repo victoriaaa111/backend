@@ -42,7 +42,7 @@ export class UserService {
     });
   }
 
-  async createOrder(orderInfo: OrderDto) {
+  async createOrder(orderInfo: OrderDto, id: string) {
     const service = await this.WorkerServicesModel.findById(
       orderInfo.serviceId,
     );
@@ -87,7 +87,7 @@ export class UserService {
     const totalPrice = durationInHours * service.price;
 
     return this.OrderModel.create({
-      userId: orderInfo.userId,
+      userId: id,
       workerId: workerId,
       userContact: orderInfo.userContact,
       startDate: orderInfo.startDate,
@@ -120,13 +120,12 @@ export class UserService {
     );
   }
 
-  async cancelOrder(id: ObjectId, userId: IdDto) {
+  async cancelOrder(id: string, userId: IdDto) {
     const order = await this.OrderModel.findById(id);
     if (!order) {
       throw new NotFoundException('Order not found');
     }
-
-    if (order.userId.toString() !== userId.userId) {
+    if (order.userId.toString() !== userId.toString()) {
       throw new BadRequestException('The order dose not belong to this user');
     }
     if (order.status !== 'Pending') {
@@ -176,18 +175,18 @@ export class UserService {
     return freeHours;
   }
 
-  async addReview(reviewInfo: ReviewDto) {
+  async addReview(reviewInfo: ReviewDto, userId: string) {
     const order = await this.OrderModel.findById(reviewInfo.orderId);
     if (!order) {
       throw new NotFoundException('Order not found');
     }
 
-    if (reviewInfo.userId !== order.userId.toString()) {
+    if (userId !== order.userId.toString()) {
       throw new BadRequestException('This order dose not belong to this user');
     }
 
     const reviewInUse = await this.ReviewModel.findOne({
-      userId: reviewInfo.userId,
+      userId: userId,
       orderId: reviewInfo.orderId,
     });
     if (order.status !== 'Done') {
@@ -205,7 +204,7 @@ export class UserService {
     const date = new Date();
 
     await this.ReviewModel.create({
-      userId: reviewInfo.userId,
+      userId: userId,
       workerId: order.workerId,
       orderId: reviewInfo.orderId,
       rating: reviewInfo.rating,
