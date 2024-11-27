@@ -35,6 +35,7 @@ export class UserController {
     if (!id) {
       throw new UnauthorizedException('User ID not found in request');
     }
+    return this.userService.findOne(id);
   }
 
   @Post('/orders')
