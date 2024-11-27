@@ -28,13 +28,14 @@ export class UserController {
   async getWorkers() {
     return this.userService.getWorkers();
   }
-  
+
   @Get()
   async findOne(@Req() request: Request) {
     const id = (request as any).userId; // Now TypeScript recognizes `userId`
     if (!id) {
       throw new UnauthorizedException('User ID not found in request');
     }
+  }
 
   @Post('/orders')
   async createOrder(@Body() orderInfo: OrderDto, @Req() request: Request) {
