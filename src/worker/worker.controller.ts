@@ -6,6 +6,8 @@ import {
   Param,
   Post,
   Put,
+  Req,
+  UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
 import { WorkerService } from './worker.service';
@@ -22,14 +24,18 @@ import { AuthGuard } from '../guards/auth.guard';
 export class WorkerController {
   constructor(private readonly workerService: WorkerService) {}
 
-  @Post('add/:workerId')
+  @Post('service')
   async addService(
-    @Param('workerId') workerId: string,
+    @Req() request: Request,
     @Body()
     serviceData: ServiceDto,
   ) {
+    const id = (request as any).userId; // Now TypeScript recognizes `userId`
+    if (!id) {
+      throw new UnauthorizedException('User ID not found in request');
+    }
     try {
-      const userObjectId = new mongoose.Types.ObjectId(workerId);
+      const userObjectId = new mongoose.Types.ObjectId(id);
 
       return this.workerService.addService(userObjectId, serviceData);
     } catch (error) {
@@ -37,17 +43,26 @@ export class WorkerController {
     }
   }
 
-  @Delete(':workerId/service/:serviceId')
+  @Delete('/service')
   async deleteServiceFromWorker(
-    @Param('workerId') workerId: string,
-    @Param('serviceId') service: string,
+    @Req() request: Request,
+    @Body('serviceId') service: string,
   ) {
-    await this.workerService.deleteServiceFromWorker(workerId, service);
+    const id = (request as any).userId; // Now TypeScript recognizes `userId`
+    if (!id) {
+      throw new UnauthorizedException('User ID not found in request');
+    }
+
+    await this.workerService.deleteServiceFromWorker(id, service);
     return { message: 'Service deleted successfully.' };
   }
 
-  @Get(':id')
-  async findOne(@Param('id') id: string) {
+  @Get()
+  async findOne(@Req() request: Request) {
+    const id = (request as any).userId; // Now TypeScript recognizes `userId`
+    if (!id) {
+      throw new UnauthorizedException('User ID not found in request');
+    }
     const worker = await this.workerService.findOne(id);
 
     // Transform the worker object to WorkerDto
@@ -57,23 +72,31 @@ export class WorkerController {
     });
   }
 
-  @Put('edit/:workerId')
+  @Put('edit')
   async editOne(
-    @Param('workerId') workerId: string,
+    @Req() request: Request,
     @Body() updateWorker: UpdateWorkerDto,
   ) {
-    await this.workerService.editOne(workerId, updateWorker);
-    return { message: 'Worker updated successfully.', workerId };
+    const id = (request as any).userId; // Now TypeScript recognizes `userId`
+    if (!id) {
+      throw new UnauthorizedException('User ID not found in request');
+    }
+    await this.workerService.editOne(id, updateWorker);
+    return { message: 'Worker updated successfully.', id };
   }
 
-  @Get('/orders/:id')
-  async findOrders(@Param('id') id: ObjectId) {
+  @Get('/orders')
+  async findOrders(@Req() request: Request) {
+    const id = (request as any).userId; // Now TypeScript recognizes `userId`
+    if (!id) {
+      throw new UnauthorizedException('User ID not found in request');
+    }
     return this.workerService.findOrders(id);
   }
 
-  @Put('/executed-status-change/:id')
+  @Put('/orders')
   async executedStatusChange(
-    @Param('id') id: ObjectId,
+    @Body('OrderId') id: ObjectId,
     @Body() orderStatus: OrderStatusDto,
   ) {
     return this.workerService.executedStatusChange(id, orderStatus);
