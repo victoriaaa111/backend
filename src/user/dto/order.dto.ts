@@ -3,9 +3,6 @@ import { Type } from 'class-transformer';
 
 export class OrderDto {
   @IsString()
-  userId: string;
-
-  @IsString()
   serviceId: string;
 
   @IsPhoneNumber('MD')
