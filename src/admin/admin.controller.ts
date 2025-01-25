@@ -97,7 +97,7 @@ export class AdminController {
     return this.adminService.getOrders();
   }
 
-  @Put('/order/change-status/:id')
+  @Put('/order/:id')
   async changeStatusOrder(
     @Param('id') id: string,
     @Body() updatedStatus: OrderStatusDto,

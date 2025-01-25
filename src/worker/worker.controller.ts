@@ -72,7 +72,7 @@ export class WorkerController {
     });
   }
 
-  @Put('edit')
+  @Put()
   async editOne(
     @Req() request: Request,
     @Body() updateWorker: UpdateWorkerDto,
