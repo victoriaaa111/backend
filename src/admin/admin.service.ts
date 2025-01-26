@@ -5,7 +5,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model, ObjectId, Types } from "mongoose";
+import { Model, ObjectId, Types } from 'mongoose';
 import { Admin } from '../auth/schemas/admin.schema';
 import { JwtService } from '@nestjs/jwt';
 import { User } from '../auth/schemas/user.schema';
@@ -14,11 +14,11 @@ import { UpdateWorkerDto } from './dtos/update-worker.dto';
 import { UpdateUserDto } from './dtos/update-user.dto';
 import { UpdateRatingDto } from './dtos/worker-rating.dto';
 import { Review } from '../user/entities/review.schema';
-import { Order } from "../user/entities/order.schema";
-import * as path from "node:path";
-import { OrderStatusDto } from "../worker/dto/order.status.dto";
-import { OrderDto } from "../user/dto/order.dto";
-import { UpdatedHoursDto } from "./dtos/updated-hours.dto";
+import { Order } from '../user/entities/order.schema';
+import * as path from 'node:path';
+import { OrderStatusDto } from '../worker/dto/order.status.dto';
+import { OrderDto } from '../user/dto/order.dto';
+import { UpdatedHoursDto } from './dtos/updated-hours.dto';
 
 @Injectable()
 export class AdminService {
@@ -278,5 +278,17 @@ export class AdminService {
     });
 
     return overlappingOrders.length === 0;
+  }
+
+  async findOne(workerId: string) {
+    const worker = await this.WorkerModel.findOne({ _id: workerId });
+    if (!worker) {
+      throw new NotFoundException('Worker not found');
+    }
+    // return this.WorkerModel.findById(workerId);
+    return this.WorkerModel.findById(workerId).populate({
+      path: 'services',
+      select: 'id service description price',
+    });
   }
 }

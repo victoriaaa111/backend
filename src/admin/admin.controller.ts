@@ -5,6 +5,8 @@ import {
   Get,
   Param,
   Put,
+  Req,
+  UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
 import { AdminService } from './admin.service';
@@ -15,6 +17,8 @@ import { AuthGuard } from '../guards/auth.guard';
 import { ObjectId } from 'mongoose';
 import { OrderStatusDto } from '../worker/dto/order.status.dto';
 import { UpdatedHoursDto } from './dtos/updated-hours.dto';
+import { plainToClass } from 'class-transformer';
+import { WorkerDto } from '../worker/dto/exclusion.dto';
 
 @UseGuards(AuthGuard)
 @Controller('admin')
@@ -111,5 +115,16 @@ export class AdminController {
     @Body() updatedHours: UpdatedHoursDto,
   ) {
     return this.adminService.rescheduleOrder(id, updatedHours);
+  }
+
+  @Get('/worker/:id')
+  async findOne(@Param('id') id: string) {
+    const worker = await this.adminService.findOne(id);
+
+    // Transform the worker object to WorkerDto
+    // return worker;
+    return plainToClass(WorkerDto, worker, {
+      excludeExtraneousValues: true,
+    });
   }
 }
