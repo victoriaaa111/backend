@@ -64,7 +64,7 @@ export class UserController {
     return this.userService.findWorkerAvailability(id, date);
   }
 
-  @Post('add-review')
+  @Post('review')
   async addReview(@Body() reviewInfo: ReviewDto, @Req() request: Request) {
     const id = (request as any).userId;
     return this.userService.addReview(reviewInfo, id);
